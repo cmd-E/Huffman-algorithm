@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
 func main() {
 	word := os.Args[1]
-	var occurense map[rune]int
+	occurences := make(map[rune]int)
 	for _, v := range word {
-		occurense[v]++
+		occurences[v]++
 	}
-	fmt.Println(occurense)
+
 }
