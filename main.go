@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
+	"strings"
 )
 
 // Node - represent element of NodeList
@@ -20,49 +22,51 @@ type NodeList struct {
 	Node *Node
 }
 
-type Pair struct {
-	Key   rune
-	Value int
+// Occurence - represent element in Occurrences slice
+type Occurence struct {
+	Symb        rune
+	Occurrences int
 }
 
-type PairList []Pair
+// Occurrences - represent slice with symblos of word and their occurrencea
+type Occurrences []Occurence
 
-func (p PairList) Len() int           { return len(p) }
-func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p PairList) Less(i, j int) bool { return p[i].Value > p[j].Value }
+func (o Occurrences) Len() int           { return len(o) }
+func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences > o[j].Occurrences }
+
+func isUnique(r rune, list []rune) bool {
+	for _, v := range list {
+		if v == r {
+			return false
+		}
+	}
+	return true
+}
 
 func main() {
-	// word := os.Args[1]
-	word := "Hello"
-	occurrences := make(map[rune]int)
+	word := os.Args[1]
+	var occurrences Occurrences
+	var doubles []rune
 	for _, v := range word {
-		occurrences[v]++
+		if isUnique(v, doubles) {
+			occurrences = append(occurrences, Occurence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
+			doubles = append(doubles, v)
+		}
 	}
-	p := make(PairList, len(occurrences))
-	i := 0
-	for k, v := range occurrences {
-		p[i] = Pair{k, v}
-		i++
-	}
-	sort.Sort(p)
-	sortedOccurrences := make(map[rune]int)
-	for _, k := range p {
-		sortedOccurrences[k.Key] = k.Value
-	}
-	for k, v := range sortedOccurrences {
-		fmt.Printf("%v: %v\n", k, v)
-	}
+	sort.Sort(occurrences)
 	nl := &NodeList{}
-	nl.createList(sortedOccurrences)
+	nl.createList(occurrences)
 	nl.displayList()
 }
 
-func (n *NodeList) createList(m map[rune]int) {
-	for k, v := range m {
-		n.insertNode(k, v)
+func (n *NodeList) createList(o Occurrences) {
+	for _, v := range o {
+		n.insertNode(v.Symb, v.Occurrences)
 	}
 }
 
+// Method is broken
 func (n *NodeList) insertNode(symb rune, freq int) {
 	if n.Node == nil {
 		n.Node = &Node{Data: symb, Freq: freq}
@@ -80,22 +84,4 @@ func (n *NodeList) displayList() {
 		n.Node = n.Node.Next
 	}
 	fmt.Printf("%v", n.Node.Data)
-}
-
-func getRarest(m map[rune]int) (rune, int, map[rune]int) {
-	var smK rune
-	var smV int
-	for i := 0; i < len(m)-1; i++ {
-		// for j := 0; j < len(m)-i-1; j++ {
-		// 	if (m)
-		// }
-	}
-	for k, v := range m {
-		if v < smV {
-			smV = v
-			smK = k
-			delete(m, k)
-		}
-	}
-	return smK, smV, m
 }
