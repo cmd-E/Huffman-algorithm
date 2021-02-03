@@ -1,3 +1,3 @@
-module github.com/cmd-e
+module github.com/huffman-algo
 
 go 1.15

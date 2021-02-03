@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	fmt.Println("Hello")
+	word := os.Args[1]
+	var occurense map[rune]int
+	for _, v := range word {
+		occurense[v]++
+	}
+	fmt.Println(occurense)
 }
