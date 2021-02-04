@@ -97,13 +97,13 @@ func (n NodeList) displayList() {
 		fmt.Printf("%v -> ", toPrint.Data)
 		toPrint = toPrint.Next
 	}
-	fmt.Print("<nil>")
+	fmt.Println("<nil>")
 }
 
 func (n NodeList) displayListReverse() {
 	toPrint := n.Tail
 	for toPrint != nil {
-		fmt.Printf("%v -> ", n.Head.Data)
+		fmt.Printf("%v -> ", toPrint.Data)
 		toPrint = toPrint.Prev
 	}
 	fmt.Print("<nil>")
