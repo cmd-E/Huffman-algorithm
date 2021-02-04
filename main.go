@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -9,7 +11,6 @@ import (
 // Node - represent element of NodeList
 //     Data - data to be coded
 //     Freq - frequency of occurrence
-//     Next - pointer to next element
 type Node struct {
 	Data interface{}
 	Freq int
@@ -36,7 +37,7 @@ type Occurrences []Occurence
 // Methods for sort.Sort()
 func (o Occurrences) Len() int           { return len(o) }
 func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences > o[j].Occurrences }
+func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences < o[j].Occurrences }
 
 func isUnique(r rune, list []rune) bool {
 	for _, v := range list {
@@ -48,12 +49,12 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	// words := os.Args[1:]
-	// if len(words) == 0 {
-	// 	log.Fatalln("No argument provided")
-	// }
-	// word := words[0]
-	word := "hello"
+	words := os.Args[1:]
+	if len(words) == 0 {
+		log.Fatalln("No argument provided")
+	}
+	word := words[0]
+	// word := "hello"
 	var occurrences Occurrences
 	var doubles []rune
 	for _, v := range word {
