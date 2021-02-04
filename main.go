@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 )
@@ -15,11 +14,14 @@ type Node struct {
 	Data interface{}
 	Freq int
 	Next *Node
+	Prev *Node
 }
 
 // NodeList - represent list of nodes
 type NodeList struct {
-	Node *Node
+	Head   *Node
+	Tail   *Node
+	length int
 }
 
 // Occurence - represent element in Occurrences slice
@@ -31,6 +33,7 @@ type Occurence struct {
 // Occurrences - represent slice with symblos of word and their occurrencea
 type Occurrences []Occurence
 
+// Methods for sort.Sort()
 func (o Occurrences) Len() int           { return len(o) }
 func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences > o[j].Occurrences }
@@ -45,7 +48,12 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	word := os.Args[1]
+	// words := os.Args[1:]
+	// if len(words) == 0 {
+	// 	log.Fatalln("No argument provided")
+	// }
+	// word := words[0]
+	word := "hello"
 	var occurrences Occurrences
 	var doubles []rune
 	for _, v := range word {
@@ -56,8 +64,10 @@ func main() {
 	}
 	sort.Sort(occurrences)
 	nl := &NodeList{}
+	fmt.Println(occurrences)
 	nl.createList(occurrences)
 	nl.displayList()
+	nl.displayListReverse()
 }
 
 func (n *NodeList) createList(o Occurrences) {
@@ -66,22 +76,35 @@ func (n *NodeList) createList(o Occurrences) {
 	}
 }
 
-// Method is broken
 func (n *NodeList) insertNode(symb rune, freq int) {
-	if n.Node == nil {
-		n.Node = &Node{Data: symb, Freq: freq}
-		return
+	if n.length == 0 {
+		node := &Node{Data: symb, Freq: freq}
+		n.Head = node
+		n.Tail = node
+	} else {
+		lastNode := n.Tail
+		newNode := &Node{Data: symb, Freq: freq}
+		lastNode.Next = newNode
+		lastNode.Next.Prev = lastNode
+		n.Tail = newNode
 	}
-	for n.Node.Next != nil {
-		n.Node = n.Node.Next
-	}
-	n.Node.Next = &Node{Data: symb, Freq: freq}
+	n.length++
 }
 
-func (n *NodeList) displayList() {
-	for n.Node.Next != nil {
-		fmt.Printf("%v -> ", n.Node.Data)
-		n.Node = n.Node.Next
+func (n NodeList) displayList() {
+	toPrint := n.Head
+	for toPrint != nil {
+		fmt.Printf("%v -> ", toPrint.Data)
+		toPrint = toPrint.Next
 	}
-	fmt.Printf("%v", n.Node.Data)
+	fmt.Print("<nil>")
+}
+
+func (n NodeList) displayListReverse() {
+	toPrint := n.Tail
+	for toPrint != nil {
+		fmt.Printf("%v -> ", n.Head.Data)
+		toPrint = toPrint.Prev
+	}
+	fmt.Print("<nil>")
 }
