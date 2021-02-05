@@ -87,7 +87,6 @@ func main() {
 	}
 	sort.Sort(occurrences)
 	nl := &NodeList{}
-	fmt.Println(occurrences)
 	nl.createList(occurrences)
 	// nl.displayList()
 	// nl.displayListReverse()
@@ -156,19 +155,13 @@ func (n NodeList) displayListReverse() {
 	fmt.Print("<nil>")
 }
 
-// Binary tree methods
-var i = 1
-
 func (bt *BinaryTree) createTree(list NodeList) {
 	for list.length != 1 {
 		firstElement := list.getSmallestFreq()
 		secondElement := list.getSmallestFreq()
-		fmt.Printf("%d. first: %v, second: %v, linked list length: %d\n", i, firstElement, secondElement, list.length)
 		tn := &TreeNode{LeftData: firstElement, RightData: secondElement, Freq: firstElement.Freq + secondElement.Freq}
 		list.insertByFreq(tn)
-		list.displayList()
-		fmt.Println("After new node insertion length is ", list.length)
-		i++
+		// list.displayList()
 	}
 }
 
