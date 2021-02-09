@@ -152,36 +152,23 @@ func (n NodeList) displayListReverse() {
 	log.Print("<nil>")
 }
 
-var symbolsToInts map[rune]int
-
 func (bt *BinaryTree) createTree(list *NodeList) {
-	// tempTreeNode := &TreeNode{}
-	// var ok bool
 	for list.length != 1 {
 		firstElement := list.getSmallestFreq()
 		secondElement := list.getSmallestFreq()
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
-
 		if _, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
 		} else if _, ok = tn.RightData.(*TreeNode); ok {
 			tn.RightData.(*TreeNode).Parent = tn
 		}
-		// if v := reflect.ValueOf(tn.LeftData.(*TreeNode)); v.Kind() == reflect.Struct {
-		// 	tn.LeftData.(*TreeNode).Parent = tn
-		// } else if v := reflect.ValueOf(tn.RightData.(*TreeNode)); v.Kind() == reflect.Struct {
-		// 	tn.RightData.(*TreeNode).Parent = tn
-		// }
 		list.insertByFreq(tn)
 		list.displayList()
 	}
-	var ok bool
 	log.Println(list.Head.Data.(*TreeNode))
-	bt.Root, ok = list.Head.Data.(*TreeNode)
-	if !ok {
+	if _, ok := list.Head.Data.(*TreeNode); !ok {
 		log.Fatalf("Error occured can't cast interface to struct")
 	}
-	// assignParents(&bt)
 }
 
 func (n *NodeList) getSmallestFreq() Node {
@@ -195,7 +182,3 @@ func (n *NodeList) getSmallestFreq() Node {
 	n.length--
 	return toReturn
 }
-
-// func assignParents(**BinaryTree) {
-
-// }
