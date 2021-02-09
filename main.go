@@ -111,7 +111,7 @@ func (n *NodeList) insertByFreq(tn *TreeNode) {
 	} else {
 		start := n.Head
 		for {
-			if start.Next == nil { // if only one element in list
+			if start.Next == nil {
 				if start.Freq > tn.Freq {
 					start.Prev = node
 					node.Next = start
@@ -166,7 +166,8 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		list.displayList()
 	}
 	log.Println(list.Head.Data.(*TreeNode))
-	if _, ok := list.Head.Data.(*TreeNode); !ok {
+	var ok bool
+	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
 		log.Fatalf("Error occured can't cast interface to struct")
 	}
 }
