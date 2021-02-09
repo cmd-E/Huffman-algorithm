@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"reflect"
 	"sort"
 	"strings"
 )
@@ -32,19 +31,9 @@ type TreeNode struct {
 	Freq      int
 }
 
-// type TreeNode struct {
-// 	SubRoot          *TreeNode
-// 	Freq             int
-// 	LeftSubRoot      *TreeNode
-// 	RightSubRoot     *TreeNode
-// 	LeftSubRootData  interface{}
-// 	RigthSubRootData interface{}
-// 	Parent           *TreeNode
-// }
-
 // BinaryTree - represent binary tree
 type BinaryTree struct {
-	Root  interface{}
+	Root  *TreeNode
 	Depth int
 }
 
@@ -170,13 +159,23 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		firstElement := list.getSmallestFreq()
 		secondElement := list.getSmallestFreq()
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
-		if v := reflect.ValueOf(tn.LeftData); v.Kind() == reflect.Struct {
-			tn.LeftData.Parent
-		}
+		// if v := reflect.ValueOf(tn.LeftData); v.Kind() == reflect.Struct {
+
+		// }
 		list.insertByFreq(tn)
 		list.displayList()
 	}
-	bt.Root = list.Head
+	var ok bool
+	log.Println(list.Head.Data.(*TreeNode))
+	bt.Root, ok = list.Head.Data.(*TreeNode)
+	if !ok {
+		log.Fatalf("Error occured can't cast interface to struct")
+	}
+	assignParents(&list.Head)
+}
+
+func assignParents(head **Node) {
+
 }
 
 func (n *NodeList) getSmallestFreq() Node {
