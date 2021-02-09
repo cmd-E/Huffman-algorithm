@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"reflect"
 	"sort"
 	"strings"
 )
 
 // Node - represent element of NodeList
-//     Data - data to be coded
-//     Freq - frequency of occurrence
+//  Data - data to be coded
+//  Freq - frequency of occurrence
 type Node struct {
 	Data interface{}
 	Freq int
@@ -43,7 +44,7 @@ type TreeNode struct {
 
 // BinaryTree - represent binary tree
 type BinaryTree struct {
-	Root  *TreeNode
+	Root  interface{}
 	Depth int
 }
 
@@ -77,8 +78,10 @@ func main() {
 	// }
 	// word := words[0]
 	word := "hello"
+	// word := "aaabbccccde"
 	var occurrences Occurrences
 	var doubles []rune
+	log.Printf("%v", []rune(word))
 	for _, v := range word {
 		if isUnique(v, doubles) {
 			occurrences = append(occurrences, Occurence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
@@ -88,10 +91,9 @@ func main() {
 	sort.Sort(occurrences)
 	nl := &NodeList{}
 	nl.createList(occurrences)
-	// nl.displayList()
-	// nl.displayListReverse()
 	bt := &BinaryTree{}
-	bt.createTree(*nl)
+	bt.createTree(nl)
+	nl.displayList()
 }
 
 // Linked list methods
@@ -119,14 +121,18 @@ func (n *NodeList) insertByFreq(tn *TreeNode) {
 		n.Tail = node
 	} else {
 		start := n.Head
-		for start != nil {
-			if start.Next == nil {
-				node.Prev = start
-				start.Next = node
-				n.Tail = start.Next
+		for {
+			if start.Next == nil { // if only one element in list
+				if start.Freq > tn.Freq {
+					start.Prev = node
+					node.Next = start
+				} else {
+					node.Prev = start
+					start.Next = node
+					n.Tail = start.Next
+				}
 				break
-			}
-			if tn.Freq > start.Freq && tn.Freq <= start.Next.Freq {
+			} else if tn.Freq >= start.Freq && tn.Freq <= start.Next.Freq {
 				reserve := start.Next
 				start.Next = &Node{Data: tn, Freq: tn.Freq, Next: reserve, Prev: start}
 				break
@@ -139,30 +145,38 @@ func (n *NodeList) insertByFreq(tn *TreeNode) {
 
 func (n NodeList) displayList() {
 	toPrint := n.Head
+	log.Printf("Displaying linked list:\n")
 	for toPrint != nil {
-		fmt.Printf("%v -> ", toPrint.Data)
+		log.Printf("%v -> ", toPrint.Data)
 		toPrint = toPrint.Next
 	}
-	fmt.Println("<nil>")
+	log.Println("<nil>")
+	log.Printf("Done\n")
 }
 
 func (n NodeList) displayListReverse() {
 	toPrint := n.Tail
 	for toPrint != nil {
-		fmt.Printf("%v -> ", toPrint.Data)
+		log.Printf("%v -> ", toPrint.Data)
 		toPrint = toPrint.Prev
 	}
-	fmt.Print("<nil>")
+	log.Print("<nil>")
 }
 
-func (bt *BinaryTree) createTree(list NodeList) {
+var symbolsToInts map[rune]int
+
+func (bt *BinaryTree) createTree(list *NodeList) {
 	for list.length != 1 {
 		firstElement := list.getSmallestFreq()
 		secondElement := list.getSmallestFreq()
-		tn := &TreeNode{LeftData: firstElement, RightData: secondElement, Freq: firstElement.Freq + secondElement.Freq}
+		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
+		if v := reflect.ValueOf(tn.LeftData); v.Kind() == reflect.Struct {
+			tn.LeftData.Parent
+		}
 		list.insertByFreq(tn)
-		// list.displayList()
+		list.displayList()
 	}
+	bt.Root = list.Head
 }
 
 func (n *NodeList) getSmallestFreq() Node {
