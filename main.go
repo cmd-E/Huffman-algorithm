@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -63,13 +64,13 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	// words := os.Args[1:]
-	// if len(words) == 0 {
-	// 	log.Fatalln("No argument provided")
-	// }
-	// word := words[0]
+	words := os.Args[1:]
+	if len(words) == 0 {
+		log.Fatalln("No argument provided")
+	}
+	word := words[0]
 	// word := "hello"
-	word := "aaabbccccde"
+	// word := "aaabbccccde"
 	var occurrences Occurrences
 	var doubles []rune
 	log.Printf("%v", []rune(word))
@@ -172,25 +173,9 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
 		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
-			/* Gather all children by instruction below
-			 * tn.LeftData is *TreeNode. Gather all children from:
-			 *    tn.LeftData.(*TreeNode).LeftBranchHas
-			 *    tn.LeftData.(*TreeNode).RightBranchHas
-			 *    tn.LeftData.(*TreeNode).LeftData (if not *TreeNode)
-			 *    tn.LeftData.(*TreeNode).RightData (if not *TreeNode)
-			 * assign all this runes to tn.LeftBranchHas
-			 */
 			tn.LeftBranchHas = getAllChildren(LDNode)
 		} else if RDNode, ok := tn.RightData.(*TreeNode); ok {
 			tn.RightData.(*TreeNode).Parent = tn
-			/* Gather all children by instruction below
-			 * tn.RightData is *TreeNode. Gather all children from:
-			 *    tn.RightData.(*TreeNode).LeftBranchHas
-			 *    tn.RightData.(*TreeNode).RightBranchHas
-			 *    tn.RightData.(*TreeNode).LeftData (if not *TreeNode)
-			 *    tn.RightData.(*TreeNode).RightData (if not *TreeNode)
-			 * assign all this runes to tn.RightBranchHas
-			 */
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
 
