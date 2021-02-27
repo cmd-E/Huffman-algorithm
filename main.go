@@ -25,10 +25,12 @@ type NodeList struct {
 
 // TreeNode - represent node in binary tree
 type TreeNode struct {
-	LeftData  interface{}
-	RightData interface{}
-	Parent    *TreeNode
-	Freq      int
+	LeftData       interface{}
+	RightData      interface{}
+	LeftBranchHas  []rune
+	RightBranchHas []rune
+	Parent         *TreeNode
+	Freq           int
 }
 
 // BinaryTree - represent binary tree
@@ -159,8 +161,40 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
 		if _, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
+			if tn.LeftData.(*TreeNode).RightBranchHas == nil && tn.LeftData.(*TreeNode).LeftBranchHas == nil {
+				if tn.LeftData.(*TreeNode).RightData != nil {
+					tn.LeftBranchHas = append(tn.LeftBranchHas, tn.LeftData.(*TreeNode).RightData.(rune))
+				}
+				if tn.LeftData.(*TreeNode).LeftData != nil {
+					tn.LeftBranchHas = append(tn.LeftBranchHas, tn.LeftData.(*TreeNode).LeftData.(rune))
+				}
+			} else {
+				if tn.RightData.(*TreeNode).RightBranchHas != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightBranchHas...)
+				}
+				if tn.RightData.(*TreeNode).LeftBranchHas != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftBranchHas...)
+				}
+			}
 		} else if _, ok = tn.RightData.(*TreeNode); ok {
 			tn.RightData.(*TreeNode).Parent = tn
+			if tn.RightData.(*TreeNode).RightBranchHas == nil && tn.RightData.(*TreeNode).LeftBranchHas == nil {
+				if tn.RightData.(*TreeNode).RightData != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightData.(rune))
+				}
+				if tn.RightData.(*TreeNode).LeftData != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftData.(rune))
+				}
+			} else {
+				if tn.RightData.(*TreeNode).RightBranchHas != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightBranchHas...)
+
+				}
+				if tn.RightData.(*TreeNode).LeftBranchHas != nil {
+					tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftBranchHas...)
+				}
+				tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftData.(rune))
+			}
 		}
 		list.insertByFreq(tn)
 		list.displayList()
