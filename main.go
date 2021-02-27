@@ -105,30 +105,41 @@ func (n *NodeList) createList(o Occurrences) {
 	}
 }
 
+// BUG insertByFreq works not as intended check with "aaabbccccde"
 func (n *NodeList) insertByFreq(tn *TreeNode) {
-	node := &Node{Data: tn, Freq: tn.Freq}
+	nodeToInsert := &Node{Data: tn, Freq: tn.Freq}
+	isInserted := false
 	if n.length == 0 {
-		n.Head = node
-		n.Tail = node
+		n.Head = nodeToInsert
+		n.Tail = nodeToInsert
 	} else {
-		start := n.Head
-		for {
-			if start.Next == nil {
-				if start.Freq > tn.Freq {
-					start.Prev = node
-					node.Next = start
+		currentNode := n.Head
+		for currentNode != nil {
+			if nodeToInsert.Freq <= currentNode.Freq {
+				if currentNode == n.Head {
+					n.Head = nodeToInsert
+					nodeToInsert.Next = currentNode
+					currentNode.Prev = nodeToInsert
+					isInserted = true
 				} else {
-					node.Prev = start
-					start.Next = node
-					n.Tail = start.Next
+					nodeToInsert.Prev = currentNode.Prev
+					currentNode.Prev.Next = nodeToInsert
+					nodeToInsert.Next = currentNode
+					currentNode.Prev = nodeToInsert
+					isInserted = true
+					// reserve := currentNode.Next
+					// currentNode.Next = &Node{Data: tn, Freq: tn.Freq, Next: reserve, Prev: currentNode}
+					// isInserted = true
 				}
 				break
-			} else if tn.Freq >= start.Freq && tn.Freq <= start.Next.Freq {
-				reserve := start.Next
-				start.Next = &Node{Data: tn, Freq: tn.Freq, Next: reserve, Prev: start}
-				break
 			}
-			start = start.Next
+			currentNode = currentNode.Next
+		}
+		if !isInserted {
+			reserve := n.Tail
+			nodeToInsert.Prev = reserve
+			reserve.Next = nodeToInsert
+			n.Tail = nodeToInsert
 		}
 	}
 	n.length++
@@ -182,7 +193,7 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 			 */
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
-		// BUG insertByFreq works not as intended check with "aaabbccccde"
+
 		list.insertByFreq(tn)
 		list.displayList()
 	}
@@ -195,9 +206,6 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 
 func getAllChildren(node *TreeNode) []rune {
 	var children []rune
-	// if node.LeftBranchHas == nil && node.RightBranchHas == nil {
-	// 	return nil
-	// }
 	if node.LeftBranchHas != nil {
 		children = append(children, node.LeftBranchHas...)
 	}
