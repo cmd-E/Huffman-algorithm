@@ -68,8 +68,8 @@ func main() {
 	// 	log.Fatalln("No argument provided")
 	// }
 	// word := words[0]
-	word := "hello"
-	// word := "aaabbccccde"
+	// word := "hello"
+	word := "aaabbccccde"
 	var occurrences Occurrences
 	var doubles []rune
 	log.Printf("%v", []rune(word))
@@ -182,6 +182,7 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 			 */
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
+		// BUG insertByFreq works not as intended check with "aaabbccccde"
 		list.insertByFreq(tn)
 		list.displayList()
 	}
