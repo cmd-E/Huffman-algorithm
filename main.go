@@ -159,9 +159,9 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		firstElement := list.getSmallestFreq()
 		secondElement := list.getSmallestFreq()
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
-		if _, ok := tn.LeftData.(*TreeNode); ok {
+		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
-			/* TODO Gather all children by instruction below
+			/* Gather all children by instruction below
 			 * tn.LeftData is *TreeNode. Gather all children from:
 			 *    tn.LeftData.(*TreeNode).LeftBranchHas
 			 *    tn.LeftData.(*TreeNode).RightBranchHas
@@ -169,24 +169,10 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 			 *    tn.LeftData.(*TreeNode).RightData (if not *TreeNode)
 			 * assign all this runes to tn.LeftBranchHas
 			 */
-			// if tn.LeftData.(*TreeNode).RightBranchHas == nil && tn.LeftData.(*TreeNode).LeftBranchHas == nil {
-			// 	if tn.LeftData.(*TreeNode).RightData != nil {
-			// 		tn.LeftBranchHas = append(tn.LeftBranchHas, tn.LeftData.(*TreeNode).RightData.(rune))
-			// 	}
-			// 	if tn.LeftData.(*TreeNode).LeftData != nil {
-			// 		tn.LeftBranchHas = append(tn.LeftBranchHas, tn.LeftData.(*TreeNode).LeftData.(rune))
-			// 	}
-			// } else {
-			// 	if tn.RightData.(*TreeNode).RightBranchHas != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightBranchHas...)
-			// 	}
-			// 	if tn.RightData.(*TreeNode).LeftBranchHas != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftBranchHas...)
-			// 	}
-			// }
-		} else if _, ok = tn.RightData.(*TreeNode); ok {
+			tn.LeftBranchHas = getAllChildren(LDNode)
+		} else if RDNode, ok := tn.RightData.(*TreeNode); ok {
 			tn.RightData.(*TreeNode).Parent = tn
-			/* TODO Gather all children by instruction below
+			/* Gather all children by instruction below
 			 * tn.RightData is *TreeNode. Gather all children from:
 			 *    tn.RightData.(*TreeNode).LeftBranchHas
 			 *    tn.RightData.(*TreeNode).RightBranchHas
@@ -194,23 +180,7 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 			 *    tn.RightData.(*TreeNode).RightData (if not *TreeNode)
 			 * assign all this runes to tn.RightBranchHas
 			 */
-			// if tn.RightData.(*TreeNode).RightBranchHas == nil && tn.RightData.(*TreeNode).LeftBranchHas == nil {
-			// 	if tn.RightData.(*TreeNode).RightData != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightData.(rune))
-			// 	}
-			// 	if tn.RightData.(*TreeNode).LeftData != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftData.(rune))
-			// 	}
-			// } else {
-			// 	if tn.RightData.(*TreeNode).RightBranchHas != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).RightBranchHas...)
-
-			// 	}
-			// 	if tn.RightData.(*TreeNode).LeftBranchHas != nil {
-			// 		tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftBranchHas...)
-			// 	}
-			// 	tn.RightBranchHas = append(tn.RightBranchHas, tn.RightData.(*TreeNode).LeftData.(rune))
-			// }
+			tn.RightBranchHas = getAllChildren(RDNode)
 		}
 		list.insertByFreq(tn)
 		list.displayList()
@@ -220,6 +190,26 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
 		log.Fatalf("Error occured can't cast interface to struct")
 	}
+}
+
+func getAllChildren(node *TreeNode) []rune {
+	var children []rune
+	// if node.LeftBranchHas == nil && node.RightBranchHas == nil {
+	// 	return nil
+	// }
+	if node.LeftBranchHas != nil {
+		children = append(children, node.LeftBranchHas...)
+	}
+	if node.RightBranchHas != nil {
+		children = append(children, node.RightBranchHas...)
+	}
+	if _, ok := node.LeftData.(*TreeNode); !ok {
+		children = append(children, node.LeftData.(rune))
+	}
+	if _, ok := node.RightData.(*TreeNode); !ok {
+		children = append(children, node.RightData.(rune))
+	}
+	return children
 }
 
 func (n *NodeList) getSmallestFreq() Node {
