@@ -9,3 +9,8 @@ user@pc:~/Huffman algorithm$ ./huffman-algo hello
 2021/02/28 10:00:21 Code for l is 0
 2021/02/28 10:00:21 Code for o is 10
 ```
+## Projects structure
+
+`btAndLinkedList` - package where binary tree and linked list and related methods are placed
+
+`occpackage` - package where placed all structs and methods related to counting occurrences and sorting
