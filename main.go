@@ -4,64 +4,10 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	btll "github.com/cmd-e/huffman-algo/btAndLinkedList"
+	occ "github.com/cmd-e/huffman-algo/occpackage"
 )
-
-// Node - represent element of NodeList
-//  Data - data to be coded
-//  Freq - frequency of occurrence
-type Node struct {
-	Data interface{}
-	Freq int
-	Next *Node
-	Prev *Node
-}
-
-// NodeList - represent list of nodes
-type NodeList struct {
-	Head   *Node
-	Tail   *Node
-	length int
-}
-
-// TreeNode - represent node in binary tree
-type TreeNode struct {
-	LeftData       interface{}
-	RightData      interface{}
-	LeftBranchHas  []rune
-	RightBranchHas []rune
-	Parent         *TreeNode
-	Freq           int
-}
-
-// BinaryTree - represent binary tree
-type BinaryTree struct {
-	Root  *TreeNode
-	Depth int
-}
-
-// Occurrence - represent element in Occurrences slice
-type Occurrence struct {
-	Symb        rune
-	Occurrences int
-}
-
-// Occurrences - represent slice with symblos of word and their occurrencea
-type Occurrences []Occurrence
-
-// Encoded struct represents symbol and it's encoded form
-type Encoded struct {
-	Symb rune
-	Code string
-}
-
-func isUnique(r rune, list []rune) bool {
-	for _, v := range list {
-		if v == r {
-			return false
-		}
-	}
-	return true
-}
 
 func main() {
 	words := os.Args[1:]
@@ -73,241 +19,35 @@ func main() {
 	// word := "aaabbccccde"
 	// word := "ааааааааааааааабббббббввввввггггггддддд"
 	// word := "beep boop beer!"
-	var unsortedOccurrences Occurrences
+	var unsortedOccurrences occ.Occurrences
 	var doubles []rune
 	for _, v := range word {
-		if isUnique(v, doubles) {
-			unsortedOccurrences = append(unsortedOccurrences, Occurrence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
+		if occ.IsUnique(v, doubles) {
+			unsortedOccurrences = append(unsortedOccurrences, occ.Occurrence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
 			doubles = append(doubles, v)
 		}
 	}
 	occurrencesAreSorted := false
 	occurrencesAreSortedInReverse := false
-	var occurrences Occurrences
-	if isSorted(unsortedOccurrences) {
+	var occurrences occ.Occurrences
+	if occ.IsSorted(unsortedOccurrences) {
 		occurrencesAreSorted = true
 	}
-	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
+	if !occurrencesAreSorted && occ.IsSortedInReverse(unsortedOccurrences) {
 		occurrencesAreSortedInReverse = true
 	}
 	if !occurrencesAreSorted && !occurrencesAreSortedInReverse {
-		occurrences = sortByOccurrences(unsortedOccurrences)
+		occurrences = occ.SortByOccurrences(unsortedOccurrences)
 	} else if occurrencesAreSortedInReverse {
-		occurrences = reverseArr(unsortedOccurrences)
+		occurrences = occ.ReverseArr(unsortedOccurrences)
 	}
-	nl := &NodeList{}
-	nl.createList(occurrences)
-	bt := &BinaryTree{}
-	bt.createTree(nl)
+	nodeList := &btll.NodeList{}
+	nodeList.CreateList(occurrences)
+	binaryTree := &btll.BinaryTree{}
+	binaryTree.CreateTree(nodeList)
 	uniqueSymbols := doubles
-	encodedSymbols := bt.encodeSymbols(uniqueSymbols)
+	encodedSymbols := binaryTree.EncodeSymbols(uniqueSymbols)
 	for _, v := range encodedSymbols {
 		log.Printf("Code for %c is %s", v.Symb, v.Code)
 	}
-}
-
-// Linked list methods
-func (n *NodeList) createList(o Occurrences) {
-	for _, v := range o {
-		if n.length == 0 {
-			node := &Node{Data: v.Symb, Freq: v.Occurrences}
-			n.Head = node
-			n.Tail = node
-		} else {
-			lastNode := n.Tail
-			newNode := &Node{Data: v.Symb, Freq: v.Occurrences}
-			lastNode.Next = newNode
-			lastNode.Next.Prev = lastNode
-			n.Tail = newNode
-		}
-		n.length++
-	}
-}
-
-func (n *NodeList) insertByFreq(tn *TreeNode) {
-	nodeToInsert := &Node{Data: tn, Freq: tn.Freq}
-	isInserted := false
-	if n.length == 0 {
-		n.Head = nodeToInsert
-		n.Tail = nodeToInsert
-	} else {
-		currentNode := n.Head
-		for currentNode != nil {
-			if nodeToInsert.Freq <= currentNode.Freq {
-				if currentNode == n.Head {
-					n.Head = nodeToInsert
-					nodeToInsert.Next = currentNode
-					currentNode.Prev = nodeToInsert
-					isInserted = true
-				} else {
-					nodeToInsert.Prev = currentNode.Prev
-					currentNode.Prev.Next = nodeToInsert
-					nodeToInsert.Next = currentNode
-					currentNode.Prev = nodeToInsert
-					isInserted = true
-				}
-				break
-			}
-			currentNode = currentNode.Next
-		}
-		if !isInserted {
-			reserve := n.Tail
-			nodeToInsert.Prev = reserve
-			reserve.Next = nodeToInsert
-			n.Tail = nodeToInsert
-		}
-	}
-	n.length++
-}
-
-func (n NodeList) displayList() {
-	toPrint := n.Head
-	log.Printf("Displaying linked list:\n")
-	for toPrint != nil {
-		log.Printf("%v -> ", toPrint.Data)
-		toPrint = toPrint.Next
-	}
-	log.Println("<nil>")
-	log.Printf("Done\n")
-}
-
-func (n NodeList) displayListReverse() {
-	toPrint := n.Tail
-	for toPrint != nil {
-		log.Printf("%v -> ", toPrint.Data)
-		toPrint = toPrint.Prev
-	}
-	log.Print("<nil>")
-}
-
-func (bt *BinaryTree) createTree(list *NodeList) {
-	for list.length != 1 {
-		firstElement := list.getSmallestFreq()
-		secondElement := list.getSmallestFreq()
-		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
-		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
-			tn.LeftData.(*TreeNode).Parent = tn
-			tn.LeftBranchHas = getAllChildren(LDNode)
-		}
-		if RDNode, ok := tn.RightData.(*TreeNode); ok {
-			tn.RightData.(*TreeNode).Parent = tn
-			tn.RightBranchHas = getAllChildren(RDNode)
-		}
-
-		list.insertByFreq(tn)
-	}
-	var ok bool
-	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
-		log.Fatalf("Error occured can't cast interface to struct")
-	}
-}
-
-func getAllChildren(node *TreeNode) []rune {
-	var children []rune
-	if node.LeftBranchHas != nil {
-		children = append(children, node.LeftBranchHas...)
-	}
-	if node.RightBranchHas != nil {
-		children = append(children, node.RightBranchHas...)
-	}
-	if _, ok := node.LeftData.(*TreeNode); !ok {
-		children = append(children, node.LeftData.(rune))
-	}
-	if _, ok := node.RightData.(*TreeNode); !ok {
-		children = append(children, node.RightData.(rune))
-	}
-	return children
-}
-
-func (n *NodeList) getSmallestFreq() Node {
-	toReturn := *n.Head
-	if n.Head.Next != nil {
-		n.Head = n.Head.Next
-		n.Head.Prev = nil
-	} else {
-		n.Head = nil
-	}
-	n.length--
-	return toReturn
-}
-
-func (bt *BinaryTree) encodeSymbols(symbolsToEncode []rune) []Encoded {
-	var encodedVals []Encoded
-	for i := 0; i < len(symbolsToEncode); i++ {
-		target := symbolsToEncode[i]
-		encodedVals = append(encodedVals, Encoded{Symb: target, Code: bt.traverseTree(target)})
-	}
-	return encodedVals
-}
-
-func (bt *BinaryTree) traverseTree(symbol rune) string {
-	var strCode []rune
-	localRoot := bt.Root
-	for {
-		if tempRune, ok := localRoot.LeftData.(rune); ok && tempRune == symbol {
-			strCode = append(strCode, '0')
-			return string(strCode)
-		}
-		if tempRune, ok := localRoot.RightData.(rune); ok && tempRune == symbol {
-			strCode = append(strCode, '1')
-			return string(strCode)
-		}
-		if localRoot.LeftBranchHas != nil && itemExist(localRoot.LeftBranchHas, symbol) {
-			localRoot = localRoot.LeftData.(*TreeNode)
-			strCode = append(strCode, '0')
-			continue
-		}
-		if localRoot.RightBranchHas != nil && itemExist(localRoot.RightBranchHas, symbol) {
-			localRoot = localRoot.RightData.(*TreeNode)
-			strCode = append(strCode, '1')
-			continue
-		}
-	}
-}
-
-func itemExist(arr []rune, toFind rune) bool {
-	for _, r := range arr {
-		if r == toFind {
-			return true
-		}
-	}
-	return false
-}
-
-func sortByOccurrences(occ Occurrences) Occurrences {
-	for i := 1; i < len(occ); i++ {
-		key := occ[i]
-		j := i - 1
-		for j >= 0 && occ[j].Occurrences > key.Occurrences {
-			occ[j+1] = occ[j]
-			j = j - 1
-		}
-		occ[j+1] = key
-	}
-	return occ
-}
-
-func isSorted(occ Occurrences) bool {
-	for i := 1; i < len(occ); i++ {
-		if occ[i-1].Occurrences > occ[i].Occurrences {
-			return false
-		}
-	}
-	return true
-}
-
-func isSortedInReverse(occ Occurrences) bool {
-	for i := 1; i < len(occ); i++ {
-		if occ[i-1].Occurrences < occ[i].Occurrences {
-			return false
-		}
-	}
-	return true
-}
-
-func reverseArr(occ Occurrences) Occurrences {
-	for i, j := 0, len(occ)-1; i < j; i, j = i+1, j-1 {
-		occ[i], occ[j] = occ[j], occ[i]
-	}
-	return occ
 }
