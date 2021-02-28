@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"sort"
 	"strings"
 )
@@ -58,7 +57,7 @@ type Encoded struct {
 // Methods for sort.Sort()
 func (o Occurrences) Len() int           { return len(o) }
 func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences < o[j].Occurrences }
+func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences <= o[j].Occurrences }
 
 func isUnique(r rune, list []rune) bool {
 	for _, v := range list {
@@ -70,22 +69,25 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	words := os.Args[1:]
-	if len(words) == 0 {
-		log.Fatalln("No argument provided")
-	}
-	word := words[0]
-	// word := "hello"
+	// words := os.Args[1:]
+	// if len(words) == 0 {
+	// 	log.Fatalln("No argument provided")
+	// }
+	// word := words[0]
+	// word := "hellow"
 	// word := "aaabbccccde"
+	word := "ааааааааааааааабббббббввввввггггггддддд"
 	var occurrences Occurrences
 	var doubles []rune
-	log.Printf("%v", []rune(word))
+	log.Printf("word to encode is %s\n", word)
+	log.Printf("runes to encode are %v\n", []rune(word))
 	for _, v := range word {
 		if isUnique(v, doubles) {
 			occurrences = append(occurrences, Occurence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
 			doubles = append(doubles, v)
 		}
 	}
+	// BUG sorting methods are working not as intended. Check with "ааааааааааааааабббббббввввввггггггддддд"
 	sort.Sort(occurrences)
 	nl := &NodeList{}
 	nl.createList(occurrences)
@@ -180,7 +182,8 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
 			tn.LeftBranchHas = getAllChildren(LDNode)
-		} else if RDNode, ok := tn.RightData.(*TreeNode); ok {
+		}
+		if RDNode, ok := tn.RightData.(*TreeNode); ok {
 			tn.RightData.(*TreeNode).Parent = tn
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
