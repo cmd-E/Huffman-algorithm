@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"sort"
 	"strings"
 )
@@ -49,6 +48,12 @@ type Occurence struct {
 // Occurrences - represent slice with symblos of word and their occurrencea
 type Occurrences []Occurence
 
+// Encoded struct represents symbol and it's encoded form
+type Encoded struct {
+	Symb rune
+	Code string
+}
+
 // Methods for sort.Sort()
 func (o Occurrences) Len() int           { return len(o) }
 func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
@@ -64,13 +69,13 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	words := os.Args[1:]
-	if len(words) == 0 {
-		log.Fatalln("No argument provided")
-	}
-	word := words[0]
+	// words := os.Args[1:]
+	// if len(words) == 0 {
+	// 	log.Fatalln("No argument provided")
+	// }
+	// word := words[0]
 	// word := "hello"
-	// word := "aaabbccccde"
+	word := "aaabbccccde"
 	var occurrences Occurrences
 	var doubles []rune
 	log.Printf("%v", []rune(word))
@@ -85,7 +90,11 @@ func main() {
 	nl.createList(occurrences)
 	bt := &BinaryTree{}
 	bt.createTree(nl)
-	nl.displayList()
+	uniqueSymbols := doubles
+	encodedSymbols := bt.encodeSymbols(uniqueSymbols)
+	for _, v := range encodedSymbols {
+		log.Printf("Code for %c is %s", v.Symb, v.Code)
+	}
 }
 
 // Linked list methods
@@ -106,7 +115,6 @@ func (n *NodeList) createList(o Occurrences) {
 	}
 }
 
-// BUG insertByFreq works not as intended check with "aaabbccccde"
 func (n *NodeList) insertByFreq(tn *TreeNode) {
 	nodeToInsert := &Node{Data: tn, Freq: tn.Freq}
 	isInserted := false
@@ -128,9 +136,6 @@ func (n *NodeList) insertByFreq(tn *TreeNode) {
 					nodeToInsert.Next = currentNode
 					currentNode.Prev = nodeToInsert
 					isInserted = true
-					// reserve := currentNode.Next
-					// currentNode.Next = &Node{Data: tn, Freq: tn.Freq, Next: reserve, Prev: currentNode}
-					// isInserted = true
 				}
 				break
 			}
@@ -180,7 +185,7 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		}
 
 		list.insertByFreq(tn)
-		list.displayList()
+		// list.displayList()
 	}
 	log.Println(list.Head.Data.(*TreeNode))
 	var ok bool
@@ -216,4 +221,47 @@ func (n *NodeList) getSmallestFreq() Node {
 	}
 	n.length--
 	return toReturn
+}
+
+func (bt *BinaryTree) encodeSymbols(symbolsToEncode []rune) []Encoded {
+	var encodedVals []Encoded
+	for i := 0; i < len(symbolsToEncode); i++ {
+		target := symbolsToEncode[i]
+		encodedVals = append(encodedVals, Encoded{Symb: target, Code: bt.traverseTree(target)})
+	}
+	return encodedVals
+}
+
+func (bt *BinaryTree) traverseTree(symbol rune) string {
+	var strCode []rune
+	localRoot := bt.Root
+	for {
+		if tempRune, ok := localRoot.LeftData.(rune); ok && tempRune == symbol {
+			strCode = append(strCode, '0')
+			return string(strCode)
+		}
+		if tempRune, ok := localRoot.RightData.(rune); ok && tempRune == symbol {
+			strCode = append(strCode, '1')
+			return string(strCode)
+		}
+		if localRoot.LeftBranchHas != nil && itemExist(localRoot.LeftBranchHas, symbol) {
+			localRoot = localRoot.LeftData.(*TreeNode)
+			strCode = append(strCode, '0')
+			continue
+		}
+		if localRoot.RightBranchHas != nil && itemExist(localRoot.RightBranchHas, symbol) {
+			localRoot = localRoot.RightData.(*TreeNode)
+			strCode = append(strCode, '1')
+			continue
+		}
+	}
+}
+
+func itemExist(arr []rune, toFind rune) bool {
+	for _, r := range arr {
+		if r == toFind {
+			return true
+		}
+	}
+	return false
 }
