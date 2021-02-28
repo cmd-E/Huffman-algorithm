@@ -13,4 +13,4 @@ user@pc:~/Huffman algorithm$ ./huffman-algo hello
 
 `btAndLinkedList` - package where binary tree and linked list and related methods are placed
 
-`occpackage` - package where placed all structs and methods related to counting occurrences and sorting
+`occpackage` - package where all structs and methods related to counting occurrences and sorting are placed
