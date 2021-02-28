@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -69,13 +70,13 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	// words := os.Args[1:]
-	// if len(words) == 0 {
-	// 	log.Fatalln("No argument provided")
-	// }
-	// word := words[0]
+	words := os.Args[1:]
+	if len(words) == 0 {
+		log.Fatalln("No argument provided")
+	}
+	word := words[0]
 	// word := "hello"
-	word := "aaabbccccde"
+	// word := "aaabbccccde"
 	var occurrences Occurrences
 	var doubles []rune
 	log.Printf("%v", []rune(word))
