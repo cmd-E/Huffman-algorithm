@@ -31,8 +31,8 @@ type Encoded struct {
 // CreateTree - creates tree from list
 func (bt *BinaryTree) CreateTree(list *NodeList) {
 	for list.Length != 1 {
-		firstElement := list.getSmallestFreq()
-		secondElement := list.getSmallestFreq()
+		firstElement := list.getElementBySmallestFrequency()
+		secondElement := list.getElementBySmallestFrequency()
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
 		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
@@ -43,7 +43,7 @@ func (bt *BinaryTree) CreateTree(list *NodeList) {
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
 
-		list.insertByFreq(tn)
+		list.insertElementByFrequency(tn)
 	}
 	var ok bool
 	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
@@ -147,7 +147,7 @@ func (n *NodeList) CreateList(o occ.Occurrences) {
 	}
 }
 
-func (n *NodeList) insertByFreq(tn *TreeNode) {
+func (n *NodeList) insertElementByFrequency(tn *TreeNode) {
 	nodeToInsert := &Node{Data: tn, Freq: tn.Freq}
 	isInserted := false
 	if n.Length == 0 {
@@ -183,7 +183,7 @@ func (n *NodeList) insertByFreq(tn *TreeNode) {
 	n.Length++
 }
 
-func (n *NodeList) getSmallestFreq() Node {
+func (n *NodeList) getElementBySmallestFrequency() Node {
 	toReturn := *n.Head
 	if n.Head.Next != nil {
 		n.Head = n.Head.Next
