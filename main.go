@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"sort"
+	"os"
 	"strings"
 )
 
@@ -39,25 +39,20 @@ type BinaryTree struct {
 	Depth int
 }
 
-// Occurence - represent element in Occurrences slice
-type Occurence struct {
+// Occurrence - represent element in Occurrences slice
+type Occurrence struct {
 	Symb        rune
 	Occurrences int
 }
 
 // Occurrences - represent slice with symblos of word and their occurrencea
-type Occurrences []Occurence
+type Occurrences []Occurrence
 
 // Encoded struct represents symbol and it's encoded form
 type Encoded struct {
 	Symb rune
 	Code string
 }
-
-// Methods for sort.Sort()
-func (o Occurrences) Len() int           { return len(o) }
-func (o Occurrences) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-func (o Occurrences) Less(i, j int) bool { return o[i].Occurrences <= o[j].Occurrences }
 
 func isUnique(r rune, list []rune) bool {
 	for _, v := range list {
@@ -69,26 +64,37 @@ func isUnique(r rune, list []rune) bool {
 }
 
 func main() {
-	// words := os.Args[1:]
-	// if len(words) == 0 {
-	// 	log.Fatalln("No argument provided")
-	// }
-	// word := words[0]
+	words := os.Args[1:]
+	if len(words) == 0 {
+		log.Fatalln("No argument provided")
+	}
+	word := words[0]
 	// word := "hellow"
 	// word := "aaabbccccde"
-	word := "ааааааааааааааабббббббввввввггггггддддд"
-	var occurrences Occurrences
+	// word := "ааааааааааааааабббббббввввввггггггддддд"
+	// word := "beep boop beer!"
+	var unsortedOccurrences Occurrences
 	var doubles []rune
-	log.Printf("word to encode is %s\n", word)
-	log.Printf("runes to encode are %v\n", []rune(word))
 	for _, v := range word {
 		if isUnique(v, doubles) {
-			occurrences = append(occurrences, Occurence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
+			unsortedOccurrences = append(unsortedOccurrences, Occurrence{Symb: v, Occurrences: strings.Count(string(word), string(v))})
 			doubles = append(doubles, v)
 		}
 	}
-	// BUG sorting methods are working not as intended. Check with "ааааааааааааааабббббббввввввггггггддддд"
-	sort.Sort(occurrences)
+	occurrencesAreSorted := false
+	occurrencesAreSortedInReverse := false
+	var occurrences Occurrences
+	if isSorted(unsortedOccurrences) {
+		occurrencesAreSorted = true
+	}
+	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
+		occurrencesAreSortedInReverse = true
+	}
+	if !occurrencesAreSorted && !occurrencesAreSortedInReverse {
+		occurrences = sortByOccurrences(unsortedOccurrences)
+	} else if occurrencesAreSortedInReverse {
+		occurrences = reverseArr(unsortedOccurrences)
+	}
 	nl := &NodeList{}
 	nl.createList(occurrences)
 	bt := &BinaryTree{}
@@ -189,9 +195,7 @@ func (bt *BinaryTree) createTree(list *NodeList) {
 		}
 
 		list.insertByFreq(tn)
-		// list.displayList()
 	}
-	log.Println(list.Head.Data.(*TreeNode))
 	var ok bool
 	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
 		log.Fatalf("Error occured can't cast interface to struct")
@@ -268,4 +272,42 @@ func itemExist(arr []rune, toFind rune) bool {
 		}
 	}
 	return false
+}
+
+func sortByOccurrences(occ Occurrences) Occurrences {
+	for i := 1; i < len(occ); i++ {
+		key := occ[i]
+		j := i - 1
+		for j >= 0 && occ[j].Occurrences > key.Occurrences {
+			occ[j+1] = occ[j]
+			j = j - 1
+		}
+		occ[j+1] = key
+	}
+	return occ
+}
+
+func isSorted(occ Occurrences) bool {
+	for i := 1; i < len(occ); i++ {
+		if occ[i-1].Occurrences > occ[i].Occurrences {
+			return false
+		}
+	}
+	return true
+}
+
+func isSortedInReverse(occ Occurrences) bool {
+	for i := 1; i < len(occ); i++ {
+		if occ[i-1].Occurrences < occ[i].Occurrences {
+			return false
+		}
+	}
+	return true
+}
+
+func reverseArr(occ Occurrences) Occurrences {
+	for i, j := 0, len(occ)-1; i < j; i, j = i+1, j-1 {
+		occ[i], occ[j] = occ[j], occ[i]
+	}
+	return occ
 }
