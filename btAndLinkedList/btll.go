@@ -3,7 +3,7 @@ package btll
 import (
 	"log"
 
-	occ "github.com/cmd-e/huffman-algo/occpackage"
+	occ "github.com/cmd-e/huffman-algorithm/occpackage"
 )
 
 // TreeNode - represent node in binary tree
@@ -31,8 +31,8 @@ type Encoded struct {
 // CreateTree - creates tree from list
 func (bt *BinaryTree) CreateTree(list *NodeList) {
 	for list.Length != 1 {
-		firstElement := list.GetSmallestFreq()
-		secondElement := list.GetSmallestFreq()
+		firstElement := list.getSmallestFreq()
+		secondElement := list.getSmallestFreq()
 		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
 		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
@@ -43,7 +43,7 @@ func (bt *BinaryTree) CreateTree(list *NodeList) {
 			tn.RightBranchHas = getAllChildren(RDNode)
 		}
 
-		list.InsertByFreq(tn)
+		list.insertByFreq(tn)
 	}
 	var ok bool
 	if bt.Root, ok = list.Head.Data.(*TreeNode); !ok {
@@ -51,16 +51,17 @@ func (bt *BinaryTree) CreateTree(list *NodeList) {
 	}
 }
 
+// EncodeSymbols encodes symbols to binary by created tree
 func (bt *BinaryTree) EncodeSymbols(symbolsToEncode []rune) []Encoded {
 	var encodedVals []Encoded
 	for i := 0; i < len(symbolsToEncode); i++ {
 		target := symbolsToEncode[i]
-		encodedVals = append(encodedVals, Encoded{Symb: target, Code: bt.TraverseTree(target)})
+		encodedVals = append(encodedVals, Encoded{Symb: target, Code: bt.traverseTree(target)})
 	}
 	return encodedVals
 }
 
-func (bt *BinaryTree) TraverseTree(symbol rune) string {
+func (bt *BinaryTree) traverseTree(symbol rune) string {
 	var strCode []rune
 	localRoot := bt.Root
 	for {
@@ -146,7 +147,7 @@ func (n *NodeList) CreateList(o occ.Occurrences) {
 	}
 }
 
-func (n *NodeList) InsertByFreq(tn *TreeNode) {
+func (n *NodeList) insertByFreq(tn *TreeNode) {
 	nodeToInsert := &Node{Data: tn, Freq: tn.Freq}
 	isInserted := false
 	if n.Length == 0 {
@@ -182,27 +183,7 @@ func (n *NodeList) InsertByFreq(tn *TreeNode) {
 	n.Length++
 }
 
-func (n NodeList) displayList() {
-	toPrint := n.Head
-	log.Printf("Displaying linked list:\n")
-	for toPrint != nil {
-		log.Printf("%v -> ", toPrint.Data)
-		toPrint = toPrint.Next
-	}
-	log.Println("<nil>")
-	log.Printf("Done\n")
-}
-
-func (n NodeList) displayListReverse() {
-	toPrint := n.Tail
-	for toPrint != nil {
-		log.Printf("%v -> ", toPrint.Data)
-		toPrint = toPrint.Prev
-	}
-	log.Print("<nil>")
-}
-
-func (n *NodeList) GetSmallestFreq() Node {
+func (n *NodeList) getSmallestFreq() Node {
 	toReturn := *n.Head
 	if n.Head.Next != nil {
 		n.Head = n.Head.Next
