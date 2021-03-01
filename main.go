@@ -31,6 +31,7 @@ func main() {
 	if strings.Trim(customOccurrencesPath, " ") == "" {
 		occurrences, uniqueSymbols = occ.GetOccurrences(word)
 	}
+	occurrences, uniqueSymbols = occ.GetOccurrences(word)
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)
 	binaryTree := &btll.BinaryTree{}
