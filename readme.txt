@@ -1,0 +1,2 @@
+-w - input to encode
+-p - path to file where custom occurrences for all symbols in word are defined

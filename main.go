@@ -1,26 +1,34 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	btll "github.com/cmd-e/huffman-algorithm/btAndLinkedList"
 	occ "github.com/cmd-e/huffman-algorithm/occpackage"
+	"github.com/cmd-e/huffman-algorithm/userinput"
 )
 
+func init() {
+	userinput.InitFlags()
+	flag.Parse()
+	if userinput.GetHelp() {
+		userinput.PrintHelp()
+		os.Exit(0)
+	}
+}
+
 func main() {
-	// words := os.Args[1:]
-	// if len(words) == 0 {
-	// 	log.Fatalln("No argument provided")
-	// }
-	// word := words[0]
-	// var word string
-	// var customOccurrencesFilePath string
-	// flag.StringVar(&word, "w", "", "User input to encode")
-	// flag.StringVar(&customOccurrencesFilePath, "p", "", "File where custom occurrences for all symbols in word are defined")
-	// flag.Parse()
-	word := "heee"
+	word, _ := userinput.GetData()
+
+	if strings.Trim(word, " ") == "" {
+		fmt.Println("No user input provided. Use -h to get help")
+		os.Exit(0)
+	}
 	occurrences, uniqueSymbols := occ.GetOccurrences(word)
-	// word := "beep boop beer!"
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)
 	binaryTree := &btll.BinaryTree{}
