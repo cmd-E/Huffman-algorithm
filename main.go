@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -38,6 +37,6 @@ func main() {
 	binaryTree.CreateTree(nodeList)
 	encodedSymbols := binaryTree.EncodeSymbols(uniqueSymbols)
 	for _, v := range encodedSymbols {
-		log.Printf("Code for %c is %s", v.Symb, v.Code)
+		fmt.Printf("Code for %c is %s\n", v.Symb, v.Code)
 	}
 }
