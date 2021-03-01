@@ -22,6 +22,14 @@ func TestEncodeSymbols(t *testing.T) {
 			{Symb: 'r', Code: "1000"},
 			{Symb: '!', Code: "1001"},
 		}},
+		{2, "ab", []btll.Encoded{
+			{Symb: 'a', Code: "0"},
+			{Symb: 'b', Code: "1"},
+		}},
+		{3, "abbbbbb", []btll.Encoded{
+			{Symb: 'a', Code: "0"},
+			{Symb: 'b', Code: "1"},
+		}},
 	}
 	for _, tcase := range testCases {
 		occurrences, uniqueSymbols := occ.GetOccurrences(tcase.input)
