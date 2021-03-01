@@ -30,8 +30,11 @@ func main() {
 	var uniqueSymbols []rune
 	if strings.Trim(customOccurrencesPath, " ") == "" {
 		occurrences, uniqueSymbols = occ.GetOccurrences(word)
+	} else {
+		occurrences, uniqueSymbols = occ.ParseOccurrencesFromFile(customOccurrencesPath)
 	}
-	occurrences, uniqueSymbols = occ.GetOccurrences(word)
+	// word := "ab"
+	// customOccurrencesPath := "C:\\Users\\me\\Desktop\\occs.txt"
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)
 	binaryTree := &btll.BinaryTree{}

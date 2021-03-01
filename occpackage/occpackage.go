@@ -1,6 +1,11 @@
 package occ
 
-import "strings"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
 // Occurrence - represent element in Occurrences slice
 type Occurrence struct {
@@ -37,6 +42,36 @@ func GetOccurrences(word string) (Occurrences, []rune) {
 		occurrencesToReturn = reverseArr(unsortedOccurrences)
 	}
 	return occurrencesToReturn, doubles
+}
+
+// ParseOccurrencesFromFile - parses file at given path and return
+func ParseOccurrencesFromFile(path string) (Occurrences, []rune) {
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("There was an error while parsing was performed", err.Error())
+		os.Exit(1)
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	var occurrences Occurrences
+	var uniqueSymbols []rune
+	for scanner.Scan() {
+		// fmt.Println(scanner.Text())
+		if []rune(strings.Trim(scanner.Text(), " "))[0] == '#' {
+			continue
+		}
+		//TODO let user choose separator for split
+		txt := scanner.Text()
+		splitted := strings.Split(strings.Trim(txt, " "), "-")
+		symb := []rune(splitted[0])[0]
+		occ := int([]rune(splitted[1])[0])
+		entity := Occurrence{Symb: symb, Occurrences: occ}
+		if isUnique(symb, uniqueSymbols) {
+			occurrences = append(occurrences, entity)
+			uniqueSymbols = append(uniqueSymbols, symb)
+		}
+	}
+	return occurrences, uniqueSymbols
 }
 
 func sortByOccurrences(occ Occurrences) Occurrences {
