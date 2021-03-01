@@ -3,7 +3,6 @@ package userinput
 import (
 	"flag"
 	"fmt"
-	"strings"
 )
 
 var word string
@@ -19,9 +18,6 @@ func InitFlags() {
 
 // GetData - returns user input and path to file with custom occurrences
 func GetData() (string, string) {
-	if strings.Trim(customOccurrencesFilePath, " ") != "" {
-		return word, customOccurrencesFilePath
-	}
 	return word, customOccurrencesFilePath
 }
 

@@ -14,21 +14,24 @@ import (
 
 func init() {
 	userinput.InitFlags()
+}
+
+func main() {
 	flag.Parse()
 	if userinput.GetHelp() {
 		userinput.PrintHelp()
 		os.Exit(0)
 	}
-}
-
-func main() {
-	word, _ := userinput.GetData()
-
+	word, customOccurrencesPath := userinput.GetData()
 	if strings.Trim(word, " ") == "" {
 		fmt.Println("No user input provided. Use -h to get help")
 		os.Exit(0)
 	}
-	occurrences, uniqueSymbols := occ.GetOccurrences(word)
+	var occurrences occ.Occurrences
+	var uniqueSymbols []rune
+	if strings.Trim(customOccurrencesPath, " ") == "" {
+		occurrences, uniqueSymbols = occ.GetOccurrences(word)
+	}
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)
 	binaryTree := &btll.BinaryTree{}
