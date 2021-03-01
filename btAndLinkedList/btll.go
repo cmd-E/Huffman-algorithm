@@ -190,6 +190,7 @@ func (n *NodeList) getElementBySmallestFrequency() Node {
 		n.Head.Prev = nil
 	} else {
 		n.Head = nil
+		n.Tail = nil
 	}
 	n.Length--
 	return toReturn

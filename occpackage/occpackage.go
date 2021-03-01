@@ -26,6 +26,7 @@ func GetOccurrences(word string) (Occurrences, []rune) {
 	var occurrencesToReturn Occurrences
 	if isSorted(unsortedOccurrences) {
 		occurrencesAreSorted = true
+		occurrencesToReturn = unsortedOccurrences
 	}
 	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
 		occurrencesAreSortedInReverse = true
