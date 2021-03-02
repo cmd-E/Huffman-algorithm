@@ -28,11 +28,10 @@ func main() {
 	}
 	var occurrences occ.Occurrences
 	var uniqueSymbols []rune
-	//TODO: consider to separate -w and -p as separate input ways
-	if strings.Trim(customOccurrencesPath, " ") == "" {
-		occurrences, uniqueSymbols = occ.GetOccurrences(word)
-	} else {
+	if strings.Trim(customOccurrencesPath, " ") != "" {
 		occurrences, uniqueSymbols = occ.ParseOccurrencesFromFile(customOccurrencesPath)
+	} else {
+		occurrences, uniqueSymbols = occ.GetOccurrences(word)
 	}
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)

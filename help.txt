@@ -1,4 +1,5 @@
 -w - input to encode
--p - path to file where custom occurrences for all symbols in word are defined
 -f - file with input to encode
-if -w and -f flags are defined, -f will be executed
+-w = -f, but from file. If -w and -f flags are defined, -f will be executed
+-p - path to file where custom occurrences for all symbols in word are defined
+-prob - available if -p is defined. Occurrences for symbols are treated as possibilities
