@@ -2,6 +2,7 @@ package occ
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -50,15 +51,12 @@ func GetOccurrences(word string) (Occurrences, []rune) {
 // ParseOccurrencesFromFile - parses file at given path and returns defined occurrences in the file for every defined symbol
 func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
 	checkForProbability := userinput.ContainsProbabilities()
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, nil, fmt.Errorf("Error occured while parsing file: %s", err.Error())
+	file, errOpen := os.Open(path)
+	if errOpen != nil {
+		return nil, nil, fmt.Errorf("Error occured while parsing file: %s", errOpen.Error())
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
-	var occurs float64
-	var probability float64
-	var isValid bool
 	var occurrences Occurrences
 	var uniqueSymbols []rune
 	for scanner.Scan() {
@@ -69,17 +67,19 @@ func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
 		txt := scanner.Text()
 		splitted := strings.Split(strings.Trim(txt, " "), "-")
 		symb := []rune(splitted[0])[0]
+		frequency := splitted[1]
 		var entity Occurrence
+
 		if checkForProbability {
-			if probability, isValid, err = getProbabilityIfValid(splitted[1]); !isValid && err != nil {
+			if isValid, err := isProbabilityValid(splitted[1]); !isValid && err != nil {
 				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
 			}
-			entity = Occurrence{Symb: symb, Occurrences: probability}
-		} else if !checkForProbability {
-			if occurs, isValid, err = getOccurrenceIfValid(splitted[1]); !isValid && err != nil {
+			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
+		} else {
+			if err := isOccurrenceValid(frequency); err != nil {
 				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
 			}
-			entity = Occurrence{Symb: symb, Occurrences: occurs}
+			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
 		}
 		if isUnique(symb, uniqueSymbols) {
 			occurrences = append(occurrences, entity)
@@ -89,22 +89,27 @@ func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
 	return occurrences, uniqueSymbols, nil
 }
 
-func getProbabilityIfValid(suspect string) (float64, bool, error) {
+func isProbabilityValid(suspect string) (bool, error) {
 	probability, err := strconv.ParseFloat(suspect, 32)
 	if err != nil {
-		return 0, false, err
+		return false, err
 	} else if probability < 0 || probability > 1 {
-		return 0, false, nil
+		return false, errors.New("Probability must be in range [0..1]")
 	}
-	return probability, true, nil
+	return true, nil
 }
 
-func getOccurrenceIfValid(suspect string) (float64, bool, error) {
-	occurrence, err := strconv.ParseFloat(suspect, 32)
+func isOccurrenceValid(suspect string) error {
+	_, err := strconv.ParseFloat(suspect, 32)
 	if err != nil {
-		return 0, false, err
+		return err
 	}
-	return occurrence, true, nil
+	return nil
+}
+
+func getFloatFromString(suspect string) float64 {
+	toReturn, _ := strconv.ParseFloat(suspect, 64)
+	return toReturn
 }
 
 func sortByOccurrences(occ Occurrences) Occurrences {
