@@ -32,7 +32,7 @@ func TestEncodeSymbols(t *testing.T) {
 		}},
 	}
 	for _, tcase := range testCases {
-		occurrences, uniqueSymbols := occ.GetOccurrences(tcase.input)
+		occurrences, uniqueSymbols := occ.GetOccurrencesAndUniqueSymbols(tcase.input)
 		nodeList := &btll.NodeList{}
 		nodeList.CreateList(occurrences)
 		binaryTree := &btll.BinaryTree{}

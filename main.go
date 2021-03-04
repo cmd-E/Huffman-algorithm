@@ -32,13 +32,14 @@ func main() {
 	word = strings.Trim(word, " ")
 	customOccurrencesPath = strings.Trim(customOccurrencesPath, " ")
 	if word != "" {
-		occurrences, uniqueSymbols = occ.GetOccurrences(word)
+		occurrences, uniqueSymbols = occ.GetOccurrencesAndUniqueSymbols(word)
 		if len(uniqueSymbols) < 2 {
 			fmt.Println("At least two unique symbols required to encode")
 			os.Exit(0)
 		}
 	} else if customOccurrencesPath != "" {
 		occurrences, uniqueSymbols, err = occ.ParseOccurrencesFromFile(customOccurrencesPath)
+		// TODO: Occurrences are need to be sorted
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)

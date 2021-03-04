@@ -20,8 +20,8 @@ type Occurrence struct {
 // Occurrences - represent slice with symblos of word and their occurrences
 type Occurrences []Occurrence
 
-// GetOccurrences - returns array of symbols and their occurrences in struct
-func GetOccurrences(word string) (Occurrences, []rune) {
+// GetOccurrencesAndUniqueSymbols - returns array of symbols and their occurrences in struct
+func GetOccurrencesAndUniqueSymbols(word string) (Occurrences, []rune) {
 	var unsortedOccurrences Occurrences
 	var doubles []rune
 	for _, v := range word {
