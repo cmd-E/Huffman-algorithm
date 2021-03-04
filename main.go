@@ -17,21 +17,32 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if userinput.GetHelp() {
+	if userinput.HelpRequested() {
 		userinput.PrintHelp()
 		os.Exit(0)
 	}
 	word, customOccurrencesPath := userinput.GetData()
-	if strings.Trim(word, " ") == "" {
+	if strings.Trim(word, " ") == "" && strings.Trim(customOccurrencesPath, " ") == "" {
 		fmt.Println("No user input provided. Use -h to get help")
 		os.Exit(0)
 	}
 	var occurrences occ.Occurrences
 	var uniqueSymbols []rune
-	if strings.Trim(customOccurrencesPath, " ") != "" {
-		occurrences, uniqueSymbols = occ.ParseOccurrencesFromFile(customOccurrencesPath)
-	} else {
+	var err error
+	word = strings.Trim(word, " ")
+	customOccurrencesPath = strings.Trim(customOccurrencesPath, " ")
+	if word != "" {
 		occurrences, uniqueSymbols = occ.GetOccurrences(word)
+		if len(uniqueSymbols) < 2 {
+			fmt.Println("At least two unique symbols required to encode")
+			os.Exit(0)
+		}
+	} else if customOccurrencesPath != "" {
+		occurrences, uniqueSymbols, err = occ.ParseOccurrencesFromFile(customOccurrencesPath)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 	}
 	nodeList := &btll.NodeList{}
 	nodeList.CreateList(occurrences)

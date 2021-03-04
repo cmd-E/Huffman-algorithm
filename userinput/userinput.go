@@ -4,11 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
-
-	occ "github.com/cmd-e/huffman-algorithm/occpackage"
 )
 
 var word string
@@ -21,29 +18,20 @@ var printHelp bool
 func InitFlags() {
 	flag.StringVar(&word, "w", "", "Input to encode")
 	flag.StringVar(&filePathToWord, "f", "", "file where word is defined")
-	flag.StringVar(&customOccurrencesFilePath, "p", "", "File where custom occurrences for all symbols in input are defined")
+	flag.StringVar(&customOccurrencesFilePath, "p", "", "File where custom occurrences for all symbols are defined")
 	flag.BoolVar(&printHelp, "h", false, "Print help")
 	flag.BoolVar(&treatOccurrencesAsProbabilities, "prob", false, "available if -p is defined. Occurrences for symbols are treated as possibilities")
 }
 
 // GetData - returns user input and path to file with custom occurrences
+// w -> f -> p (prob) | h
 func GetData() (string, string) {
-	if strings.Trim(filePathToWord, " ") != "" { // -f flag
-		return getWordFromFile(filePathToWord), ""
-	} else if strings.Trim(customOccurrencesFilePath, " ") != "" { // -p flag
-		if treatOccurrencesAsProbabilities {
-			if probabilitiesAreValid(customOccurrencesFilePath) {
-				return
-			}
-		}
+	if strings.Trim(word, " ") != "" {
+		return word, "" // -w flag
+	} else if strings.Trim(filePathToWord, " ") != "" {
+		return getWordFromFile(filePathToWord), "" // -f flag
 	}
-	// else if strings.Trim(word, " ") != "" && strings.Trim(customOccurrencesFilePath, " ") != "" { // -w and -p flags
-	// 	if !customOccurrencesAreValid(customOccurrencesFilePath, word) {
-	// 		fmt.Println("File with occurences is not valid for this word. You can provide only file and symbols in it will be coded, but not validated with input")
-	// 		os.Exit(0)
-	// 	}
-	// }
-	return word, customOccurrencesFilePath
+	return "", customOccurrencesFilePath // -p flag
 }
 
 func getWordFromFile(path string) string {
@@ -55,37 +43,8 @@ func getWordFromFile(path string) string {
 	return string(file)
 }
 
-// BUG check with "ab" and file occs.txt
-func customOccurrencesAreValid(p, w string) bool {
-	runes := []rune(w)
-	_, uniqueSymbols := occ.ParseOccurrencesFromFile(p)
-	for _, us := range uniqueSymbols {
-		for j, suspect := range runes {
-			if us == suspect {
-				if j != len(runes) {
-					runes = append(runes[:j], runes[j+1:]...)
-					log.Println("a")
-
-				} else {
-					runes = append(runes[:j], runes[j:]...)
-					log.Println("b")
-				}
-				log.Println(runes)
-			}
-		}
-	}
-	if len(runes) == 0 {
-		return true
-	}
-	return false
-}
-
-func probabilitiesAreValid() bool {
-	return true
-}
-
-// GetHelp - checks if user requested help
-func GetHelp() bool {
+// HelpRequested - checks if user requested help
+func HelpRequested() bool {
 	return printHelp
 }
 

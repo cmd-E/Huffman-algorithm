@@ -44,19 +44,20 @@ func GetOccurrences(word string) (Occurrences, []rune) {
 	return occurrencesToReturn, doubles
 }
 
-// ParseOccurrencesFromFile - parses file at given path and return
-func ParseOccurrencesFromFile(path string) (Occurrences, []rune) {
+// ParseOccurrencesFromFile - parses file at given path and returns defined occurrences in the file for every defined symbol
+func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
+	// if userinput.
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println("There was an error while parsing was performed", err.Error())
-		os.Exit(1)
+		return nil, nil, fmt.Errorf("Error occured while parsing file: %s", err.Error())
+		// fmt.Println("There was an error while parsing was performed", err.Error())
+		// os.Exit(1)
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	var occurrences Occurrences
 	var uniqueSymbols []rune
 	for scanner.Scan() {
-		// fmt.Println(scanner.Text())
 		if []rune(strings.Trim(scanner.Text(), " "))[0] == '#' {
 			continue
 		}
@@ -71,7 +72,12 @@ func ParseOccurrencesFromFile(path string) (Occurrences, []rune) {
 			uniqueSymbols = append(uniqueSymbols, symb)
 		}
 	}
-	return occurrences, uniqueSymbols
+	return occurrences, uniqueSymbols, nil
+}
+
+// ParseProbabilitiesFromFile - parses file at given path and returns defined probanilities in the file for every defined symbol
+func ParseProbabilitiesFromFile(path string) {
+
 }
 
 func sortByOccurrences(occ Occurrences) Occurrences {
