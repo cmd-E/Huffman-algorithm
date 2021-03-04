@@ -106,10 +106,6 @@ func getOccurrenceIfValid(suspect string) (float64, bool, error) {
 	}
 	return occurrence, true, nil
 }
-func getProbability(str string) float64 {
-	toReturn, _ := strconv.ParseFloat(str, 64)
-	return toReturn
-}
 
 func sortByOccurrences(occ Occurrences) Occurrences {
 	for i := 1; i < len(occ); i++ {
