@@ -13,7 +13,7 @@ type TreeNode struct {
 	LeftBranchHas  []rune
 	RightBranchHas []rune
 	Parent         *TreeNode
-	Freq           int
+	Freq           float64
 }
 
 // BinaryTree - represent binary tree
@@ -33,7 +33,7 @@ func (bt *BinaryTree) CreateTree(list *NodeList) {
 	for list.Length != 1 {
 		firstElement := list.getElementBySmallestFrequency()
 		secondElement := list.getElementBySmallestFrequency()
-		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: firstElement.Freq + secondElement.Freq}
+		tn := &TreeNode{LeftData: firstElement.Data, RightData: secondElement.Data, Freq: float64(firstElement.Freq + secondElement.Freq)}
 		if LDNode, ok := tn.LeftData.(*TreeNode); ok {
 			tn.LeftData.(*TreeNode).Parent = tn
 			tn.LeftBranchHas = getAllChildren(LDNode)
@@ -117,7 +117,7 @@ func itemExist(arr []rune, toFind rune) bool {
 //  Freq - frequency of occurrence
 type Node struct {
 	Data interface{}
-	Freq int
+	Freq float64
 	Next *Node
 	Prev *Node
 }
@@ -133,7 +133,7 @@ type NodeList struct {
 func (n *NodeList) CreateList(o occ.Occurrences) {
 	for _, v := range o {
 		if n.Length == 0 {
-			node := &Node{Data: v.Symb, Freq: v.Occurrences}
+			node := &Node{Data: v.Symb, Freq: float64(v.Occurrences)}
 			n.Head = node
 			n.Tail = node
 		} else {

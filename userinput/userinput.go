@@ -48,6 +48,11 @@ func HelpRequested() bool {
 	return printHelp
 }
 
+// ContainsProbabilities - checks if prob flag is checked. If is checked numbers in file -p are treated as floats in range of [0..1]
+func ContainsProbabilities() bool {
+	return treatOccurrencesAsProbabilities
+}
+
 // PrintHelp - prints help if user is asking for it
 func PrintHelp() {
 	helpFile, err := ioutil.ReadFile("help.txt")
