@@ -48,8 +48,8 @@ func GetOccurrencesAndUniqueSymbols(word string) (Occurrences, []rune) {
 	return occurrencesToReturn, doubles
 }
 
-// ParseOccurrencesFromFile - parses file at given path and returns defined occurrences in the file for every defined symbol
-func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
+// GetOccurrencesAndUniqueSymbolsFromFile - parses file at given path and returns defined occurrences in the file and unique symbols
+func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, error) {
 	checkForProbability := userinput.ContainsProbabilities()
 	file, errOpen := os.Open(path)
 	if errOpen != nil {
@@ -69,9 +69,8 @@ func ParseOccurrencesFromFile(path string) (Occurrences, []rune, error) {
 		symb := []rune(splitted[0])[0]
 		frequency := splitted[1]
 		var entity Occurrence
-
 		if checkForProbability {
-			if isValid, err := isProbabilityValid(splitted[1]); !isValid && err != nil {
+			if isValid, err := isProbabilityValid(splitted[1]); !isValid {
 				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
 			}
 			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
