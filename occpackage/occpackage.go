@@ -57,7 +57,7 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
-	var occurrences Occurrences
+	var unsortedOccurrences Occurrences
 	var uniqueSymbols []rune
 	for scanner.Scan() {
 		if []rune(strings.Trim(scanner.Text(), " "))[0] == '#' {
@@ -81,11 +81,26 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
 		}
 		if isUnique(symb, uniqueSymbols) {
-			occurrences = append(occurrences, entity)
+			unsortedOccurrences = append(unsortedOccurrences, entity)
 			uniqueSymbols = append(uniqueSymbols, symb)
 		}
 	}
-	return occurrences, uniqueSymbols, nil
+	occurrencesAreSorted := false
+	occurrencesAreSortedInReverse := false
+	var occurrencesToReturn Occurrences
+	if isSorted(unsortedOccurrences) {
+		occurrencesAreSorted = true
+		occurrencesToReturn = unsortedOccurrences
+	}
+	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
+		occurrencesAreSortedInReverse = true
+	}
+	if !occurrencesAreSorted && !occurrencesAreSortedInReverse {
+		occurrencesToReturn = sortByOccurrences(unsortedOccurrences)
+	} else if occurrencesAreSortedInReverse {
+		occurrencesToReturn = reverseArr(unsortedOccurrences)
+	}
+	return occurrencesToReturn, uniqueSymbols, nil
 }
 
 func isProbabilityValid(suspect string) (bool, error) {
