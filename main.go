@@ -22,15 +22,15 @@ func main() {
 		os.Exit(0)
 	}
 	word, customOccurrencesPath := userinput.GetData()
-	if strings.Trim(word, " ") == "" && strings.Trim(customOccurrencesPath, " ") == "" {
+	word = strings.Trim(word, " ")
+	customOccurrencesPath = strings.Trim(customOccurrencesPath, " ")
+	if word == "" && customOccurrencesPath == "" {
 		fmt.Println("No user input provided. Use -h to get help")
 		os.Exit(0)
 	}
 	var occurrences occ.Occurrences
 	var uniqueSymbols []rune
 	var err error
-	word = strings.Trim(word, " ")
-	customOccurrencesPath = strings.Trim(customOccurrencesPath, " ")
 	if word != "" {
 		occurrences, uniqueSymbols = occ.GetOccurrencesAndUniqueSymbols(word)
 		if len(uniqueSymbols) < 2 {
