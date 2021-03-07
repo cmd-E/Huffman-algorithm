@@ -1,5 +1,6 @@
--w - input to encode
--f - file with input to encode
+-w - Input to encode
+-f - File with input to encode
 -w = -f, but from file. If -w and -f flags are defined, -f will be executed
--p - path to file where custom occurrences for all symbols in word are defined
--prob - available if -p is defined. Occurrences for symbols are treated as possibilities
+-p - Path to file where custom occurrences for all symbols in word are defined
+-prob - Available if -p is defined. Occurrences for symbols are treated as possibilities
+-s - Available if -p is defined. Changes default separator (-) on user's one

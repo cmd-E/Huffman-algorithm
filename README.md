@@ -59,6 +59,25 @@ o-0.5
 ```
 Lines which has `#` as first symbol are ignored
 
+Provide file with predefined occurrences for each symbols and set own separator:
+```console
+user@pc:~/Huffman algorithm$ go build
+user@pc:~/Huffman algorithm$ ./huffman-algorithm -p occurrences.txt -s "*"
+Code for h is 110
+Code for e is 111
+Code for l is 0  
+Code for o is 10 
+```
+occurrences.txt contains:
+```
+h*1
+# Comment
+e*1
+l*2
+o*1
+```
+Lines which has `#` as first symbol are ignored
+
 Type `./huffman-algorithm -h` to get full list of commands:
 ```console
 user@pc:~/Huffman algorithm$ go build
