@@ -39,7 +39,6 @@ func main() {
 		}
 	} else if customOccurrencesPath != "" {
 		occurrences, uniqueSymbols, err = occ.GetOccurrencesAndUniqueSymbolsFromFile(customOccurrencesPath)
-		// TODO: Occurrences are need to be sorted
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
