@@ -1,4 +1,7 @@
 # Huffman-algorithm
+![GitHub](https://img.shields.io/github/license/cmd-e/Huffman-algorithm?style=plastic)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/cmd-e/Huffman-algorithm?style=plastic)
+
 Implementation of [Huffman algorithm coding](https://en.wikipedia.org/wiki/Huffman_coding) in golang 
 ## Usage
 Provide word only:
