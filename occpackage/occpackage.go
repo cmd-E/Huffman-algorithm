@@ -66,6 +66,9 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 		}
 		txt := scanner.Text()
 		splitted := strings.Split(strings.Trim(txt, " "), separator)
+		if len(splitted) == 1 {
+			return nil, nil, fmt.Errorf("Error occured while trying to separate values. Check separator in program and in text file. Separator used: [%s]", separator)
+		}
 		symb := []rune(splitted[0])[0]
 		frequency := splitted[1]
 		var entity Occurrence
