@@ -5,6 +5,7 @@ import (
 
 	btll "github.com/cmd-e/huffman-algorithm/btAndLinkedList"
 	occ "github.com/cmd-e/huffman-algorithm/occpackage"
+	"github.com/cmd-e/huffman-algorithm/tests/testutils"
 )
 
 func TestEncodeSymbols(t *testing.T) {
@@ -46,6 +47,24 @@ func TestEncodeSymbols(t *testing.T) {
 			if suspect != tcase.expected[i] {
 				t.Errorf("Test number %d. Input: %s. Expected: %v, got %v", tcase.num, tcase.input, tcase.expected, encodedSymbols)
 			}
+		}
+	}
+}
+
+func TestCreateList(t *testing.T) {
+	testCases := []struct {
+		num         int
+		occurrences occ.Occurrences
+		expected    btll.NodeList
+	}{
+		{1, testutils.PrepareOccurrences(1), testutils.PrepareNodeList(1)},
+		{2, testutils.PrepareOccurrences(2), testutils.PrepareNodeList(2)},
+	}
+	for _, tcase := range testCases {
+		n := btll.NodeList{}
+		n.CreateList(tcase.occurrences)
+		if !testutils.LinkedListsAreEqual(n, tcase.expected) {
+			t.Errorf("Test number %d. Expected: %v, got %v", tcase.num, tcase.expected, n)
 		}
 	}
 }

@@ -132,13 +132,13 @@ type NodeList struct {
 // CreateList - creates linked list from user's input
 func (n *NodeList) CreateList(o occ.Occurrences) {
 	for _, v := range o {
+		node := &Node{Data: v.Symb, Freq: v.Occurrences}
 		if n.Length == 0 {
-			node := &Node{Data: v.Symb, Freq: v.Occurrences}
 			n.Head = node
 			n.Tail = node
 		} else {
 			lastNode := n.Tail
-			newNode := &Node{Data: v.Symb, Freq: v.Occurrences}
+			newNode := node
 			lastNode.Next = newNode
 			lastNode.Next.Prev = lastNode
 			n.Tail = newNode
