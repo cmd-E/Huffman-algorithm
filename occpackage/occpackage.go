@@ -59,13 +59,13 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 	scanner := bufio.NewScanner(file)
 	var unsortedOccurrences Occurrences
 	var uniqueSymbols []rune
+	separator := userinput.GetSeparator()
 	for scanner.Scan() {
 		if []rune(strings.Trim(scanner.Text(), " "))[0] == '#' {
 			continue
 		}
-		//TODO let user choose separator for split
 		txt := scanner.Text()
-		splitted := strings.Split(strings.Trim(txt, " "), "-")
+		splitted := strings.Split(strings.Trim(txt, " "), separator)
 		symb := []rune(splitted[0])[0]
 		frequency := splitted[1]
 		var entity Occurrence

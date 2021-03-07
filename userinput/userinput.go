@@ -13,6 +13,7 @@ var customOccurrencesFilePath string
 var filePathToWord string
 var treatOccurrencesAsProbabilities bool
 var printHelp bool
+var customSeparator string
 
 // InitFlags - defines flags for user to operate program
 func InitFlags() {
@@ -21,6 +22,7 @@ func InitFlags() {
 	flag.StringVar(&customOccurrencesFilePath, "p", "", "File where custom occurrences for all symbols are defined")
 	flag.BoolVar(&printHelp, "h", false, "Print help")
 	flag.BoolVar(&treatOccurrencesAsProbabilities, "prob", false, "available if -p is defined. Occurrences for symbols are treated as possibilities")
+	flag.StringVar(&customSeparator, "s", "-", "available if -p is defined. Changes default separator (-) on user's one")
 }
 
 // GetData - returns user input and path to file with custom occurrences
@@ -51,6 +53,11 @@ func HelpRequested() bool {
 // ContainsProbabilities - checks if prob flag is checked. If is checked numbers in file -p are treated as floats in range of [0..1]
 func ContainsProbabilities() bool {
 	return treatOccurrencesAsProbabilities
+}
+
+// GetSeparator - returns separator for file when -p flag is defined
+func GetSeparator() string {
+	return customSeparator
 }
 
 // PrintHelp - prints help if user is asking for it
