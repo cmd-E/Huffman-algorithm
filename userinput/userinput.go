@@ -32,12 +32,23 @@ func InitFlags() {
 // GetData - returns user input and path to file with custom occurrences
 // w -> f -> p (prob) | h
 func GetData() (string, string) {
-	if strings.Trim(word, " ") != "" {
+	word = strings.Trim(word, " ")
+	filePathToWord = strings.Trim(filePathToWord, " ")
+	dataToEncode = strings.Trim(dataToEncode, " ")
+	dataToDecode = strings.Trim(dataToDecode, " ")
+	customOccurrencesFilePath = strings.Trim(customOccurrencesFilePath, " ")
+	if word != "" {
 		return word, "" // -w flag
-	} else if strings.Trim(filePathToWord, " ") != "" {
+	} else if filePathToWord != "" {
 		return getWordFromFile(filePathToWord), "" // -f flag
+	} else if customOccurrencesFilePath != "" { // -p flag
+		if dataToEncode != "" {
+			return dataToEncode, customOccurrencesFilePath // -p and -e
+		} else if dataToDecode != "" {
+			return dataToDecode, customOccurrencesFilePath // -p and -d
+		}
 	}
-	return "", customOccurrencesFilePath // -p flag
+	return "", ""
 }
 
 func getWordFromFile(path string) string {

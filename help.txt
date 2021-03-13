@@ -6,5 +6,6 @@
 -p - Path to file where custom occurrences for all symbols in word are defined
 -e - Input to encode
 -d - Input to decode
+If -e and -f are defined -e will be executed
 -prob - Available if -p is defined. Occurrences for symbols are treated as probabilities
 -s - Available if -p is defined. Changes default separator (-) on user's one
