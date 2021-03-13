@@ -30,7 +30,7 @@ func InitFlags() {
 }
 
 // GetData - returns user input and path to file with custom occurrences
-// w -> f -> p (prob) | h
+// w -> f -> p (prob) -e -d | h
 func GetData() (string, string) {
 	word = strings.Trim(word, " ")
 	filePathToWord = strings.Trim(filePathToWord, " ")
@@ -65,6 +65,11 @@ func HelpRequested() bool {
 	return printHelp
 }
 
+// DecodeInputRequested - checks if user requested decoding
+func DecodeInputRequested() bool {
+	return strings.Trim(dataToDecode, " ") != ""
+}
+
 // ContainsProbabilities - checks if prob flag is checked. If is checked numbers in file -p are treated as floats in range of [0..1]
 func ContainsProbabilities() bool {
 	return treatOccurrencesAsProbabilities
@@ -79,7 +84,7 @@ func GetSeparator() string {
 func PrintHelp() {
 	helpFile, err := ioutil.ReadFile("help.txt")
 	if err != nil {
-		fmt.Println("There was an error while attempting to read file text: ", err.Error())
+		fmt.Println("There was an error while attempting to read help file text: ", err.Error())
 		return
 	}
 	fmt.Println(string(helpFile))

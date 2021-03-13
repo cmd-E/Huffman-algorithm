@@ -2,6 +2,7 @@ package btll
 
 import (
 	"log"
+	"unicode"
 
 	occ "github.com/cmd-e/huffman-algorithm/occpackage"
 )
@@ -64,12 +65,13 @@ func (bt *BinaryTree) EncodeSymbols(symbolsToEncode []rune) []Encoded {
 func (bt *BinaryTree) traverseTree(symbol rune) string {
 	var strCode []rune
 	localRoot := bt.Root
+	symbol = unicode.ToLower(symbol)
 	for {
-		if tempRune, ok := localRoot.LeftData.(rune); ok && tempRune == symbol {
+		if tempRune, ok := localRoot.LeftData.(rune); ok && unicode.ToLower(tempRune) == symbol {
 			strCode = append(strCode, '0')
 			return string(strCode)
 		}
-		if tempRune, ok := localRoot.RightData.(rune); ok && tempRune == symbol {
+		if tempRune, ok := localRoot.RightData.(rune); ok && unicode.ToLower(tempRune) == symbol {
 			strCode = append(strCode, '1')
 			return string(strCode)
 		}

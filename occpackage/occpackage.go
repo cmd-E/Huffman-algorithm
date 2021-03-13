@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/cmd-e/huffman-algorithm/userinput"
 )
@@ -53,7 +54,7 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 	checkForProbability := userinput.ContainsProbabilities()
 	file, errOpen := os.Open(path)
 	if errOpen != nil {
-		return nil, nil, fmt.Errorf("Error occured while parsing file: %s", errOpen.Error())
+		return nil, nil, fmt.Errorf("error occured while parsing file: %s", errOpen.Error())
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
@@ -67,19 +68,19 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 		txt := scanner.Text()
 		splitted := strings.Split(strings.Trim(txt, " "), separator)
 		if len(splitted) == 1 {
-			return nil, nil, fmt.Errorf("Error occured while trying to separate values. Check separator in program and in text file. Separator used: [%s]", separator)
+			return nil, nil, fmt.Errorf("error occured while trying to separate values. Check separator in program and in text file. Separator used: [%s]", separator)
 		}
 		symb := []rune(splitted[0])[0]
 		frequency := splitted[1]
 		var entity Occurrence
 		if checkForProbability {
 			if isValid, err := isProbabilityValid(splitted[1]); !isValid {
-				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
+				return nil, nil, fmt.Errorf("error occurred while parsing file with probabilities: %s", err.Error())
 			}
 			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
 		} else {
 			if err := isOccurrenceValid(frequency); err != nil {
-				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
+				return nil, nil, fmt.Errorf("error occurred while parsing file with probabilities: %s", err.Error())
 			}
 			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
 		}
@@ -106,12 +107,32 @@ func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, e
 	return occurrencesToReturn, uniqueSymbols, nil
 }
 
+func EnoughDataToEncode(word, uniqueSymbols []rune) bool {
+	if userinput.DecodeInputRequested() {
+		return true
+	}
+	for i := 0; i < len(word); i++ {
+		found := false
+		for j := 0; j < len(uniqueSymbols); j++ {
+			if unicode.ToLower(word[i]) == unicode.ToLower(uniqueSymbols[j]) {
+				// uniqueSymbols = append(uniqueSymbols[:j], uniqueSymbols[j+1:]...)
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
+}
+
 func isProbabilityValid(suspect string) (bool, error) {
 	probability, err := strconv.ParseFloat(suspect, 32)
 	if err != nil {
 		return false, err
 	} else if probability < 0 || probability > 1 {
-		return false, errors.New("Probability must be in range [0..1]")
+		return false, errors.New("probability must be in range [0..1]")
 	}
 	return true, nil
 }
