@@ -14,6 +14,8 @@ var filePathToWord string
 var treatOccurrencesAsProbabilities bool
 var printHelp bool
 var customSeparator string
+var dataToEncode string
+var dataToDecode string
 
 // InitFlags - defines flags for user to operate program
 func InitFlags() {
@@ -23,6 +25,8 @@ func InitFlags() {
 	flag.BoolVar(&printHelp, "h", false, "Print help")
 	flag.BoolVar(&treatOccurrencesAsProbabilities, "prob", false, "available if -p is defined. Occurrences for symbols are treated as possibilities")
 	flag.StringVar(&customSeparator, "s", "-", "available if -p is defined. Changes default separator (-) on user's one")
+	flag.StringVar(&dataToEncode, "e", "", "Input to encode")
+	flag.StringVar(&dataToEncode, "d", "", "Input to dencode")
 }
 
 // GetData - returns user input and path to file with custom occurrences
