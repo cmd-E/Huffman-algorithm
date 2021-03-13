@@ -2,5 +2,5 @@
 -f - File with input to encode
 -w = -f, but from file. If -w and -f flags are defined, -f will be executed
 -p - Path to file where custom occurrences for all symbols in word are defined
--prob - Available if -p is defined. Occurrences for symbols are treated as possibilities
+-prob - Available if -p is defined. Occurrences for symbols are treated as probabilities
 -s - Available if -p is defined. Changes default separator (-) on user's one
