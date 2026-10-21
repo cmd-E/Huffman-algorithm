@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +12,9 @@ import (
 	"github.com/cmd-e/huffman-algorithm/userinput"
 )
 
+//go:embed help.txt
+var helpText string
+
 func init() {
 	userinput.InitFlags()
 }
@@ -18,7 +22,7 @@ func init() {
 func main() {
 	flag.Parse()
 	if userinput.HelpRequested() {
-		userinput.PrintHelp()
+		fmt.Print(helpText)
 		os.Exit(0)
 	}
 	word, customOccurrencesPath := userinput.GetData()
@@ -34,20 +38,27 @@ func main() {
 	if word != "" {
 		occurrences, uniqueSymbols = occ.GetOccurrencesAndUniqueSymbols(word)
 		if len(uniqueSymbols) < 2 {
-			fmt.Println("At least two unique symbols required to encode")
-			os.Exit(0)
+			fmt.Fprintln(os.Stderr, "At least two unique symbols required to encode")
+			os.Exit(1)
 		}
 	} else if customOccurrencesPath != "" {
-		occurrences, uniqueSymbols, err = occ.GetOccurrencesAndUniqueSymbolsFromFile(customOccurrencesPath)
+		file, openErr := os.Open(customOccurrencesPath)
+		if openErr != nil {
+			fmt.Fprintln(os.Stderr, openErr)
+			os.Exit(1)
+		}
+		defer file.Close()
+		occurrences, uniqueSymbols, err = occ.Parse(file, userinput.GetSeparator(), userinput.ContainsProbabilities())
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 	}
-	nodeList := &btll.NodeList{}
-	nodeList.CreateList(occurrences)
 	binaryTree := &btll.BinaryTree{}
-	binaryTree.CreateTree(nodeList)
+	if err := binaryTree.Build(occurrences); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	encodedSymbols := binaryTree.EncodeSymbols(uniqueSymbols)
 	for _, v := range encodedSymbols {
 		fmt.Printf("Code for %c is %s\n", v.Symb, v.Code)

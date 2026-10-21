@@ -2,176 +2,77 @@ package occ
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
-	"os"
+	"io"
+	"math"
+	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/cmd-e/huffman-algorithm/userinput"
+	"unicode/utf8"
 )
 
-// Occurrence - represent element in Occurrences slice
 type Occurrence struct {
 	Symb        rune
 	Occurrences float64
 }
-
-// Occurrences - represent slice with symblos of word and their occurrences
 type Occurrences []Occurrence
 
-// GetOccurrencesAndUniqueSymbols - returns array of symbols and their occurrences in struct
 func GetOccurrencesAndUniqueSymbols(word string) (Occurrences, []rune) {
-	var unsortedOccurrences Occurrences
-	var doubles []rune
-	for _, v := range word {
-		if isUnique(v, doubles) {
-			unsortedOccurrences = append(unsortedOccurrences, Occurrence{Symb: v, Occurrences: float64(strings.Count(string(word), string(v)))})
-			doubles = append(doubles, v)
+	counts := make(map[rune]int)
+	order := []rune{}
+	for _, r := range word {
+		if counts[r] == 0 {
+			order = append(order, r)
 		}
+		counts[r]++
 	}
-	occurrencesAreSorted := false
-	occurrencesAreSortedInReverse := false
-	var occurrencesToReturn Occurrences
-	if isSorted(unsortedOccurrences) {
-		occurrencesAreSorted = true
-		occurrencesToReturn = unsortedOccurrences
+	values := make(Occurrences, 0, len(order))
+	for _, r := range order {
+		values = append(values, Occurrence{r, float64(counts[r])})
 	}
-	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
-		occurrencesAreSortedInReverse = true
-	}
-	if !occurrencesAreSorted && !occurrencesAreSortedInReverse {
-		occurrencesToReturn = sortByOccurrences(unsortedOccurrences)
-	} else if occurrencesAreSortedInReverse {
-		occurrencesToReturn = reverseArr(unsortedOccurrences)
-	}
-	return occurrencesToReturn, doubles
+	sort.SliceStable(values, func(i, j int) bool { return values[i].Occurrences < values[j].Occurrences })
+	return values, order
 }
 
-// GetOccurrencesAndUniqueSymbolsFromFile - parses file at given path and returns defined occurrences in the file and unique symbols
-func GetOccurrencesAndUniqueSymbolsFromFile(path string) (Occurrences, []rune, error) {
-	checkForProbability := userinput.ContainsProbabilities()
-	file, errOpen := os.Open(path)
-	if errOpen != nil {
-		return nil, nil, fmt.Errorf("Error occured while parsing file: %s", errOpen.Error())
+// Parse reads an occurrence table without depending on CLI flags or filesystem state.
+func Parse(reader io.Reader, separator string, probabilities bool) (Occurrences, []rune, error) {
+	if separator == "" {
+		return nil, nil, fmt.Errorf("separator cannot be empty")
 	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	var unsortedOccurrences Occurrences
-	var uniqueSymbols []rune
-	separator := userinput.GetSeparator()
+	scanner := bufio.NewScanner(reader)
+	scanner.Buffer(make([]byte, 4096), 1024*1024)
+	values := Occurrences{}
+	order := []rune{}
+	seen := make(map[rune]bool)
+	line := 0
 	for scanner.Scan() {
-		if []rune(strings.Trim(scanner.Text(), " "))[0] == '#' {
+		line++
+		text := strings.TrimSpace(scanner.Text())
+		if text == "" || strings.HasPrefix(text, "#") {
 			continue
 		}
-		txt := scanner.Text()
-		splitted := strings.Split(strings.Trim(txt, " "), separator)
-		if len(splitted) == 1 {
-			return nil, nil, fmt.Errorf("Error occured while trying to separate values. Check separator in program and in text file. Separator used: [%s]", separator)
+		fields := strings.SplitN(text, separator, 2)
+		if len(fields) != 2 || utf8.RuneCountInString(fields[0]) != 1 {
+			return nil, nil, fmt.Errorf("line %d: expected one symbol and a weight separated by %q", line, separator)
 		}
-		symb := []rune(splitted[0])[0]
-		frequency := splitted[1]
-		var entity Occurrence
-		if checkForProbability {
-			if isValid, err := isProbabilityValid(splitted[1]); !isValid {
-				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
-			}
-			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
-		} else {
-			if err := isOccurrenceValid(frequency); err != nil {
-				return nil, nil, fmt.Errorf("Error occurred while parsing file with probabilities: %s", err.Error())
-			}
-			entity = Occurrence{Symb: symb, Occurrences: getFloatFromString(frequency)}
+		symbol, _ := utf8.DecodeRuneInString(fields[0])
+		weight, err := strconv.ParseFloat(strings.TrimSpace(fields[1]), 64)
+		if err != nil || math.IsNaN(weight) || math.IsInf(weight, 0) || weight <= 0 || (probabilities && weight > 1) {
+			return nil, nil, fmt.Errorf("line %d: invalid positive weight", line)
 		}
-		if isUnique(symb, uniqueSymbols) {
-			unsortedOccurrences = append(unsortedOccurrences, entity)
-			uniqueSymbols = append(uniqueSymbols, symb)
+		if seen[symbol] {
+			return nil, nil, fmt.Errorf("line %d: duplicate symbol", line)
 		}
+		seen[symbol] = true
+		order = append(order, symbol)
+		values = append(values, Occurrence{symbol, weight})
 	}
-	occurrencesAreSorted := false
-	occurrencesAreSortedInReverse := false
-	var occurrencesToReturn Occurrences
-	if isSorted(unsortedOccurrences) {
-		occurrencesAreSorted = true
-		occurrencesToReturn = unsortedOccurrences
+	if err := scanner.Err(); err != nil {
+		return nil, nil, fmt.Errorf("read occurrence table: %w", err)
 	}
-	if !occurrencesAreSorted && isSortedInReverse(unsortedOccurrences) {
-		occurrencesAreSortedInReverse = true
+	if len(values) < 2 {
+		return nil, nil, fmt.Errorf("at least two distinct symbols required")
 	}
-	if !occurrencesAreSorted && !occurrencesAreSortedInReverse {
-		occurrencesToReturn = sortByOccurrences(unsortedOccurrences)
-	} else if occurrencesAreSortedInReverse {
-		occurrencesToReturn = reverseArr(unsortedOccurrences)
-	}
-	return occurrencesToReturn, uniqueSymbols, nil
-}
-
-func isProbabilityValid(suspect string) (bool, error) {
-	probability, err := strconv.ParseFloat(suspect, 32)
-	if err != nil {
-		return false, err
-	} else if probability < 0 || probability > 1 {
-		return false, errors.New("Probability must be in range [0..1]")
-	}
-	return true, nil
-}
-
-func isOccurrenceValid(suspect string) error {
-	_, err := strconv.ParseFloat(suspect, 32)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func getFloatFromString(suspect string) float64 {
-	toReturn, _ := strconv.ParseFloat(suspect, 64)
-	return toReturn
-}
-
-func sortByOccurrences(occ Occurrences) Occurrences {
-	for i := 1; i < len(occ); i++ {
-		key := occ[i]
-		j := i - 1
-		for j >= 0 && occ[j].Occurrences > key.Occurrences {
-			occ[j+1] = occ[j]
-			j = j - 1
-		}
-		occ[j+1] = key
-	}
-	return occ
-}
-
-func isSorted(occ Occurrences) bool {
-	for i := 1; i < len(occ); i++ {
-		if occ[i-1].Occurrences > occ[i].Occurrences {
-			return false
-		}
-	}
-	return true
-}
-
-func isSortedInReverse(occ Occurrences) bool {
-	for i := 1; i < len(occ); i++ {
-		if occ[i-1].Occurrences < occ[i].Occurrences {
-			return false
-		}
-	}
-	return true
-}
-
-func reverseArr(occ Occurrences) Occurrences {
-	for i, j := 0, len(occ)-1; i < j; i, j = i+1, j-1 {
-		occ[i], occ[j] = occ[j], occ[i]
-	}
-	return occ
-}
-
-func isUnique(r rune, list []rune) bool {
-	for _, v := range list {
-		if v == r {
-			return false
-		}
-	}
-	return true
+	sort.SliceStable(values, func(i, j int) bool { return values[i].Occurrences < values[j].Occurrences })
+	return values, order, nil
 }

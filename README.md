@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/cmd-e/Huffman-algorithm?style=plastic)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/cmd-e/Huffman-algorithm?style=plastic)
 
-Implementation of [Huffman algorithm coding](https://en.wikipedia.org/wiki/Huffman_coding) in golang 
+Implementation of [Huffman algorithm coding](https://en.wikipedia.org/wiki/Huffman_coding) in golang
 ## Usage
 Provide word only:
 ```console
@@ -10,8 +10,8 @@ user@pc:~/Huffman algorithm$ go build
 user@pc:~/Huffman algorithm$ ./huffman-algorithm -w hello
 Code for h is 110
 Code for e is 111
-Code for l is 0  
-Code for o is 10 
+Code for l is 0
+Code for o is 10
 ```
 Provide file with word:
 ```console
@@ -30,8 +30,8 @@ user@pc:~/Huffman algorithm$ go build
 user@pc:~/Huffman algorithm$ ./huffman-algorithm -p occurrences.txt
 Code for h is 110
 Code for e is 111
-Code for l is 0  
-Code for o is 10 
+Code for l is 0
+Code for o is 10
 ```
 occurrences.txt contains:
 ```
@@ -49,8 +49,8 @@ user@pc:~/Huffman algorithm$ go build
 user@pc:~/Huffman algorithm$ ./huffman-algorithm -p occurrences.txt -prob
 Code for h is 110
 Code for e is 111
-Code for l is 0  
-Code for o is 10 
+Code for l is 0
+Code for o is 10
 ```
 occurrences.txt contains:
 ```
@@ -68,8 +68,8 @@ user@pc:~/Huffman algorithm$ go build
 user@pc:~/Huffman algorithm$ ./huffman-algorithm -p occurrences.txt -s "*"
 Code for h is 110
 Code for e is 111
-Code for l is 0  
-Code for o is 10 
+Code for l is 0
+Code for o is 10
 ```
 occurrences.txt contains:
 ```
@@ -102,3 +102,27 @@ user@pc:~/Huffman algorithm$ ./huffman-algorithm -h
 `userinput` - package to accept input and flags from user
 
 `help.txt` - file with help to display if user reqested it
+## Validation and implementation
+
+Requires Go 1.20+. The CLI builds a typed Huffman tree with a min heap and generates the code table in one traversal. The linked-list API remains for educational compatibility.
+
+Run `go test ./...`. Occurrence files allow blank lines and comments, require two distinct symbols with finite positive weights, and reject duplicate symbols and scanner failures. Probability weights cannot exceed 1. Lines are limited to 1 MiB.
+
+## Continuous integration and tests
+
+Use Go 1.20 or later for local tests; CI uses Go 1.27 with a C compiler for the race detector.
+
+```sh
+go test -count=1 ./...
+go vet ./...
+```
+
+CI builds the CLI, runs tests with the race detector, publishes coverage and enforces
+the total statement coverage floor in `.github/coverage-baseline.json`. Tests exercise
+exact code fixtures, prefix-free and deterministic coding, Unicode, malformed weights,
+read errors, broken/cyclic compatibility lists, overflow and rebuild failure, input
+priority, and the compiled CLI from a temporary working directory. CLI subprocess
+checks are functional tests; their coverage is not counted in the unit-test profile.
+
+CodeQL and weekly Go/Actions Dependabot updates are configured. The proposed
+`.github/branch-ruleset.json` must be applied separately in GitHub settings.
